@@ -2118,7 +2118,7 @@ async function loadRequests() {
         id,
         user_id,
         group_id,
-        attempted_code,
+        entered_code,
         status,
         created_at
       `)
@@ -2266,7 +2266,7 @@ async function loadRequests() {
 
         <code>
           ${escapeHtml(
-            request.attempted_code ||
+            request.entered_code ||
             "-"
           )}
         </code>
@@ -2583,3 +2583,4 @@ function escapeHtml(
 
 </body>
 </html>
+
