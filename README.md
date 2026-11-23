@@ -14,17 +14,20 @@ SQL sxemi hesablar, qruplar, üzvlük, real vaxt mesajları və private PDF buck
 
 ## 2. GitHub
 
-Faylları repository-nin əsas qovluğuna yerləşdir: `index.html`, `admin.html`, `styles.css`, `app.js`, `admin.js`, `supabase.js`, `config.js` və `supabase/schema.sql`. HTML və JS faylları eyni səviyyədə qalmalıdır.
+Faylları repository-nin əsas qovluğuna yerləşdir: `index.html`, `admin.html`, `styles.css`, `app.js`, `admin.js`, `supabase.js`, `config.js`, `vercel.json` və `supabase/schema.sql`. HTML və JS faylları eyni səviyyədə qalmalıdır.
 
 Public anon açarı brauzer üçün nəzərdə tutulub və gizli deyil; təhlükəsizlik RLS qaydaları ilə təmin edilir. `service_role` secret açarını heç vaxt repository-yə yükləmə.
 
 ## 3. Vercel
 
-1. Vercel-də GitHub repository-ni **Import** et.
-2. **Framework Preset: Other** seç. Build command boş qalsın; HTML/CSS/JS statik saytı üçün build addımı lazım deyil. Vercel faylları repository-nin əsas qovluğundan yayımlayır.
-3. Deploy et. Ana səhifə `/`, admin səhifəsi `/admin.html` ünvanında olacaq.
-4. GitHub-a yeni commit gələndə Vercel avtomatik yenidən deploy edir.
+1. `vercel.json` faylını repository-nin əsas qovluğuna əlavə et; `"framework": null` Vercel-ə bu layihənin statik HTML olduğunu bildirir.
+2. Vercel-də GitHub repository-ni **Import** et.
+3. **Framework Preset: Other** seç. Build command boş qalsın; HTML/CSS/JS statik saytı üçün build addımı lazım deyil. Vercel faylları repository-nin əsas qovluğundan yayımlayır.
+4. Deploy et. Ana səhifə `/`, admin səhifəsi `/admin.html` ünvanında olacaq.
+5. GitHub-a yeni commit gələndə Vercel avtomatik yenidən deploy edir.
 
 ## Təhlükəsizlik qeydi
 
 Mesajlar TLS bağlantısı və Supabase giriş qaydaları ilə qorunur; ucdan-uca şifrələmə yoxdur. PDF yükləmə limiti 10 MB-dır.
+
+
