@@ -1,2586 +1,559 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Chatbot — Admin Panel</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --text: #101828;
-      --muted: #667085;
-      --border: #e4e7ec;
-      --dark: #111827;
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --warning: #d97706;
-      --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-      --radius: 20px;
-    }
-
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 transparent;
-    }
-
-    body {
-      margin: 0;
-      font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
-      background:
-        radial-gradient(
-          circle at top left,
-          rgba(37, 99, 235, 0.07),
-          transparent 35%
-        ),
-        var(--bg);
-
-      color: var(--text);
-    }
-
-    button,
-    input {
-      font-family: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* =========================
-       LOGIN
-    ========================= */
-
-    .login-page {
-      min-height: 100vh;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 24px;
-
-      position: relative;
-      overflow: hidden;
-
-      background:
-        radial-gradient(
-          circle at 15% 20%,
-          rgba(37, 99, 235, 0.18),
-          transparent 32%
-        ),
-        radial-gradient(
-          circle at 85% 80%,
-          rgba(124, 58, 237, 0.14),
-          transparent 35%
-        ),
-        #f8fafc;
-    }
-
-    .login-page::before {
-      content: "";
-      position: absolute;
-
-      width: 420px;
-      height: 420px;
-
-      border-radius: 50%;
-
-      background: rgba(255, 255, 255, 0.55);
-
-      top: -220px;
-      right: -150px;
-
-      filter: blur(10px);
-    }
-
-    .login-page::after {
-      content: "";
-      position: absolute;
-
-      width: 300px;
-      height: 300px;
-
-      border-radius: 50%;
-
-      background: rgba(255, 255, 255, 0.45);
-
-      bottom: -150px;
-      left: -100px;
-
-      filter: blur(10px);
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 430px;
-
-      background: rgba(255, 255, 255, 0.94);
-
-      border: 1px solid rgba(255, 255, 255, 0.8);
-
-      border-radius: 28px;
-
-      padding: 38px;
-
-      box-shadow:
-        0 30px 90px rgba(15, 23, 42, 0.13),
-        0 4px 15px rgba(15, 23, 42, 0.04);
-
-      position: relative;
-      z-index: 2;
-
-      backdrop-filter: blur(20px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-
-      margin-bottom: 30px;
-    }
-
-    .brand-icon {
-      width: 50px;
-      height: 50px;
-
-      border-radius: 15px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb,
-          #7c3aed
-        );
-
-      color: white;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 21px;
-      font-weight: 900;
-
-      box-shadow:
-        0 12px 25px rgba(37, 99, 235, 0.25);
-    }
-
-    .brand-name {
-      font-size: 24px;
-      font-weight: 850;
-      letter-spacing: -0.5px;
-    }
-
-    .brand-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .login-title {
-      font-size: 28px;
-      font-weight: 800;
-
-      margin: 0 0 8px;
-
-      letter-spacing: -0.7px;
-    }
-
-    .login-description {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-
-      margin: 0 0 28px;
-    }
-
-    .form-group {
-      margin-bottom: 17px;
-    }
-
-    .form-label {
-      display: block;
-
-      font-size: 13px;
-      font-weight: 700;
-
-      margin-bottom: 8px;
-    }
-
-    .input-wrap {
-      position: relative;
-    }
-
-    .input-wrap input {
-      padding-left: 44px;
-      padding-right: 45px;
-    }
-
-    .input-icon {
-      position: absolute;
-
-      left: 15px;
-      top: 50%;
-
-      transform: translateY(-50%);
-
-      color: #98a2b3;
-
-      font-size: 15px;
-
-      pointer-events: none;
-    }
-
-    input {
-      width: 100%;
-
-      padding: 14px 15px;
-
-      border: 1px solid var(--border);
-
-      border-radius: 13px;
-
-      outline: none;
-
-      background: #fff;
-
-      color: var(--text);
-
-      font-size: 14px;
-
-      transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
-    }
-
-    input::placeholder {
-      color: #98a2b3;
-    }
-
-    input:focus {
-      border-color: #93b4ff;
-
-      box-shadow:
-        0 0 0 4px rgba(37, 99, 235, 0.09);
-    }
-
-    .password-toggle {
-      position: absolute;
-
-      right: 11px;
-      top: 50%;
-
-      transform: translateY(-50%);
-
-      border: 0;
-
-      background: transparent;
-
-      width: 34px;
-      height: 34px;
-
-      color: #667085;
-
-      padding: 0;
-    }
-
-    .password-toggle:hover {
-      color: var(--dark);
-    }
-
-    .login-button {
-      width: 100%;
-
-      border: 0;
-
-      padding: 14px 16px;
-
-      border-radius: 13px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb,
-          #4f46e5
-        );
-
-      color: white;
-
-      font-size: 14px;
-      font-weight: 800;
-
-      box-shadow:
-        0 12px 25px rgba(37, 99, 235, 0.22);
-
-      transition:
-        transform 0.15s,
-        box-shadow 0.15s,
-        opacity 0.15s;
-    }
-
-    .login-button:hover {
-      transform: translateY(-1px);
-
-      box-shadow:
-        0 15px 30px rgba(37, 99, 235, 0.28);
-    }
-
-    .login-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .login-footer {
-      margin-top: 25px;
-
-      text-align: center;
-
-      font-size: 12px;
-
-      color: #98a2b3;
-    }
-
-    .error {
-      margin-top: 15px;
-
-      padding: 12px 14px;
-
-      border-radius: 12px;
-
-      background: #fef2f2;
-
-      border: 1px solid #fecaca;
-
-      color: #b91c1c;
-
-      font-size: 13px;
-
-      line-height: 1.5;
-    }
-
-    .success-box {
-      margin-top: 15px;
-
-      padding: 12px 14px;
-
-      border-radius: 12px;
-
-      background: #f0fdf4;
-
-      border: 1px solid #bbf7d0;
-
-      color: #15803d;
-
-      font-size: 13px;
-    }
-
-    /* =========================
-       ADMIN
-    ========================= */
-
-    .admin-page {
-      min-height: 100vh;
-    }
-
-    .topbar {
-      height: 74px;
-
-      background: rgba(255, 255, 255, 0.94);
-
-      border-bottom: 1px solid var(--border);
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 0 30px;
-
-      position: sticky;
-      top: 0;
-
-      z-index: 20;
-
-      backdrop-filter: blur(15px);
-    }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-    }
-
-    .mini-logo {
-      width: 40px;
-      height: 40px;
-
-      border-radius: 12px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb,
-          #7c3aed
-        );
-
-      color: white;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-weight: 900;
-      font-size: 17px;
-    }
-
-    .topbar-title {
-      font-weight: 850;
-      font-size: 17px;
-    }
-
-    .topbar-subtitle {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 2px;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .admin-account {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-
-    .admin-avatar {
-      width: 35px;
-      height: 35px;
-
-      border-radius: 50%;
-
-      background: #eef2ff;
-
-      color: #4338ca;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-weight: 800;
-      font-size: 13px;
-    }
-
-    .admin-email {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .logout {
-      width: auto;
-
-      border: 1px solid var(--border);
-
-      background: white;
-
-      color: #344054;
-
-      padding: 9px 14px;
-
-      border-radius: 10px;
-
-      font-weight: 700;
-
-      font-size: 12px;
-    }
-
-    .logout:hover {
-      background: #f8fafc;
-    }
-
-    .dashboard {
-      max-width: 1300px;
-
-      margin: 0 auto;
-
-      padding: 34px 25px 60px;
-    }
-
-    .welcome {
-      margin-bottom: 25px;
-    }
-
-    .welcome h1 {
-      margin: 0;
-
-      font-size: 29px;
-
-      letter-spacing: -0.8px;
-    }
-
-    .welcome p {
-      margin: 7px 0 0;
-
-      color: var(--muted);
-
-      font-size: 13px;
-    }
-
-    .stats {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 16px;
-
-      margin-bottom: 25px;
-    }
-
-    .stat {
-      background: white;
-
-      border: 1px solid var(--border);
-
-      border-radius: 18px;
-
-      padding: 20px;
-
-      box-shadow:
-        0 8px 30px rgba(15, 23, 42, 0.035);
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 15px;
-    }
-
-    .stat-icon {
-      width: 45px;
-      height: 45px;
-
-      border-radius: 14px;
-
-      background: #eff6ff;
-
-      color: #2563eb;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 18px;
-
-      flex-shrink: 0;
-    }
-
-    .stat-number {
-      font-size: 25px;
-
-      font-weight: 850;
-
-      line-height: 1;
-    }
-
-    .stat-label {
-      color: var(--muted);
-
-      font-size: 12px;
-
-      margin-top: 5px;
-    }
-
-    .tabs {
-      display: flex;
-
-      gap: 8px;
-
-      margin-bottom: 20px;
-
-      padding: 5px;
-
-      background: #eef1f6;
-
-      border-radius: 14px;
-
-      width: fit-content;
-
-      max-width: 100%;
-
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      width: auto;
-
-      border: 0;
-
-      background: transparent;
-
-      color: #667085;
-
-      padding: 10px 17px;
-
-      border-radius: 10px;
-
-      font-size: 12px;
-
-      font-weight: 800;
-    }
-
-    .tab-btn:hover {
-      color: var(--text);
-    }
-
-    .tab-btn.active {
-      background: white;
-
-      color: #111827;
-
-      box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.08);
-    }
-
-    .section {
-      background: white;
-
-      border: 1px solid var(--border);
-
-      border-radius: 20px;
-
-      padding: 24px;
-
-      margin-bottom: 18px;
-
-      box-shadow:
-        0 8px 35px rgba(15, 23, 42, 0.035);
-    }
-
-    .section-header {
-      display: flex;
-
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 15px;
-
-      margin-bottom: 20px;
-    }
-
-    .section h2 {
-      margin: 0;
-
-      font-size: 17px;
-
-      letter-spacing: -0.3px;
-    }
-
-    .section-description {
-      color: var(--muted);
-
-      font-size: 12px;
-
-      margin-top: 5px;
-    }
-
-    .create-form {
-      display: flex;
-
-      gap: 10px;
-
-      align-items: center;
-    }
-
-    .create-form input {
-      flex: 1;
-      margin: 0;
-    }
-
-    .primary {
-      border: 0;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb,
-          #4f46e5
-        );
-
-      color: white;
-
-      padding: 12px 18px;
-
-      border-radius: 11px;
-
-      font-weight: 800;
-
-      font-size: 12px;
-
-      width: auto;
-    }
-
-    .primary:hover {
-      opacity: 0.92;
-    }
-
-    /* GROUP */
-
-    .group {
-      border: 1px solid var(--border);
-
-      border-radius: 16px;
-
-      padding: 18px;
-
-      margin-bottom: 12px;
-
-      transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
-    }
-
-    .group:hover {
-      border-color: #cbd5e1;
-
-      box-shadow:
-        0 8px 25px rgba(15, 23, 42, 0.05);
-    }
-
-    .group:last-child {
-      margin-bottom: 0;
-    }
-
-    .group-top {
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: flex-start;
-
-      gap: 15px;
-    }
-
-    .group-title {
-      font-weight: 850;
-
-      font-size: 15px;
-    }
-
-    .group-id {
-      color: var(--muted);
-
-      font-size: 11px;
-
-      margin-top: 5px;
-    }
-
-    .code {
-      display: inline-flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-      background: #f8fafc;
-
-      border: 1px solid #e2e8f0;
-
-      padding: 8px 11px;
-
-      border-radius: 9px;
-
-      margin-top: 15px;
-
-      font-family:
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        monospace;
-
-      font-size: 12px;
-
-      color: #334155;
-    }
-
-    .actions {
-      display: flex;
-
-      gap: 8px;
-
-      flex-wrap: wrap;
-
-      margin-top: 14px;
-    }
-
-    .actions button {
-      width: auto;
-
-      padding: 9px 13px;
-
-      border-radius: 9px;
-
-      border: 0;
-
-      font-size: 11px;
-
-      font-weight: 800;
-    }
-
-    .success {
-      background: #dcfce7;
-
-      color: #166534;
-    }
-
-    .success:hover {
-      background: #bbf7d0;
-    }
-
-    .danger {
-      background: #fee2e2;
-
-      color: #b91c1c;
-    }
-
-    .danger:hover {
-      background: #fecaca;
-    }
-
-    .warning {
-      background: #fef3c7;
-
-      color: #92400e;
-    }
-
-    .warning:hover {
-      background: #fde68a;
-    }
-
-    .secondary {
-      background: #f1f5f9;
-
-      color: #334155;
-    }
-
-    .secondary:hover {
-      background: #e2e8f0;
-    }
-
-    /* REQUEST */
-
-    .request {
-      border: 1px solid var(--border);
-
-      border-radius: 16px;
-
-      padding: 18px;
-
-      margin-bottom: 12px;
-    }
-
-    .request:last-child {
-      margin-bottom: 0;
-    }
-
-    .request-top {
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      gap: 12px;
-
-      margin-bottom: 14px;
-    }
-
-    .request-user {
-      font-size: 13px;
-
-      font-weight: 800;
-
-      word-break: break-all;
-    }
-
-    .request-line {
-      margin: 8px 0;
-
-      font-size: 12px;
-
-      color: #475467;
-    }
-
-    .request-line strong {
-      color: #101828;
-    }
-
-    code {
-      background: #f1f5f9;
-
-      border-radius: 6px;
-
-      padding: 4px 7px;
-
-      font-size: 11px;
-    }
-
-    .status {
-      display: inline-flex;
-
-      padding: 5px 9px;
-
-      border-radius: 20px;
-
-      font-size: 10px;
-
-      font-weight: 900;
-
-      text-transform: uppercase;
-    }
-
-    .pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .approved {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .rejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .threat {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .empty {
-      padding: 35px 20px;
-
-      text-align: center;
-
-      color: var(--muted);
-
-      font-size: 13px;
-
-      border: 1px dashed #d0d5dd;
-
-      border-radius: 14px;
-    }
-
-    .loading {
-      padding: 25px;
-
-      text-align: center;
-
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    @media (max-width: 700px) {
-      .topbar {
-        height: auto;
-
-        padding: 16px 18px;
-
-        align-items: flex-start;
-      }
-
-      .topbar-right {
-        gap: 8px;
-      }
-
-      .admin-email {
-        display: none;
-      }
-
-      .dashboard {
-        padding: 25px 15px 50px;
-      }
-
-      .welcome h1 {
-        font-size: 24px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .section {
-        padding: 17px;
-
-        border-radius: 16px;
-      }
-
-      .create-form {
-        flex-direction: column;
-
-        align-items: stretch;
-      }
-
-      .create-form input,
-      .create-form button {
-        width: 100%;
-      }
-
-      .group-top,
-      .request-top {
-        align-items: flex-start;
-
-        flex-direction: column;
-      }
-
-      .tabs {
-        width: 100%;
-      }
-
-      .tab-btn {
-        flex: 1;
-      }
-
-      .login-box {
-        padding: 28px 22px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#17372d">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot — Admin Panel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+:root{--bg:#f4f2ec;--text:#1a2c23;--muted:#77827a;--border:#e7e5dd;--dark:#17372d;--gold:#f3bd57;--green:#17372d}
+body{margin:0;font-family:'DM Sans',sans-serif;background:radial-gradient(circle at top left,rgba(243,189,87,.13),transparent 30%),radial-gradient(circle at bottom right,rgba(23,55,45,.08),transparent 32%),var(--bg);color:var(--text)}
+button,input{font-family:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:radial-gradient(circle at 15% 20%,rgba(243,189,87,.20),transparent 32%),radial-gradient(circle at 85% 80%,rgba(23,55,45,.14),transparent 35%),#f4f2ec}
+.login-box{width:100%;max-width:430px;background:rgba(255,254,250,.94);border:1px solid #e6e2d9;border-radius:28px;padding:38px;box-shadow:0 30px 90px rgba(15,23,42,.13),0 4px 15px rgba(15,23,42,.04);position:relative;z-index:2;backdrop-filter:blur(20px)}
+.brand{display:flex;align-items:center;gap:13px;margin-bottom:30px}
+.brand-icon{width:50px;height:50px;border-radius:15px;background:linear-gradient(145deg,#1a3b30,#10291f);color:#f3bd57;border:2px solid #f3bd57;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:900;box-shadow:0 12px 25px rgba(23,55,45,.25)}
+.brand-name{font-size:24px;font-weight:850;letter-spacing:-.5px}
+.brand-subtitle{font-size:13px;color:var(--muted);margin-top:3px}
+.login-title{font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:-.7px}
+.login-description{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 28px}
+.form-group{margin-bottom:17px}
+.form-label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+.input-wrap{position:relative}
+.input-wrap input{padding-left:44px;padding-right:45px}
+.input-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#98a2b3;font-size:15px;pointer-events:none}
+input{width:100%;padding:14px 15px;border:1px solid var(--border);border-radius:13px;outline:none;background:#fff;color:var(--text);font-size:14px;transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:#98a2b3}
+input:focus{border-color:#8ba993;box-shadow:0 0 0 3px rgba(139,169,147,.10)}
+.password-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);border:0;background:transparent;width:34px;height:34px;color:#667085;padding:0}
+.password-toggle:hover{color:var(--dark)}
+.login-button{width:100%;border:0;padding:14px 16px;border-radius:13px;background:#17372d;color:#fff;font-size:14px;font-weight:800;box-shadow:0 12px 25px rgba(23,55,45,.22);transition:transform .15s,box-shadow .15s,opacity .15s}
+.login-button:hover{background:#20503f;transform:translateY(-1px);box-shadow:0 15px 30px rgba(23,55,45,.28)}
+.login-button:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.login-footer{margin-top:25px;text-align:center;font-size:12px;color:#98a2b3}
+.error{margin-top:15px;padding:12px 14px;border-radius:12px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:13px;line-height:1.5}
+.success-box{margin-top:15px;padding:12px 14px;border-radius:12px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:13px}
+
+/* ADMIN */
+.admin-page{min-height:100vh}
+.topbar{height:74px;background:rgba(253,251,247,.94);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:20;backdrop-filter:blur(15px)}
+.topbar-left{display:flex;align-items:center;gap:13px}
+.mini-logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#1a3b30,#10291f);color:#f3bd57;border:2px solid #f3bd57;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px}
+.topbar-title{font-weight:850;font-size:17px}
+.topbar-subtitle{color:var(--muted);font-size:11px;margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:15px}
+.admin-account{display:flex;align-items:center;gap:9px}
+.admin-avatar{width:35px;height:35px;border-radius:50%;background:#17372d;color:#f3bd57;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.admin-email{font-size:12px;color:var(--muted)}
+.logout{border:1px solid var(--border);background:#fffefa;color:#34483a;padding:9px 14px;border-radius:10px;font-weight:700;font-size:12px}
+.logout:hover{background:#eef3ec}
+.dashboard{max-width:1300px;margin:0 auto;padding:34px 25px 60px}
+.welcome{margin-bottom:25px}
+.welcome h1{margin:0;font-size:29px;letter-spacing:-.8px}
+.welcome p{margin:7px 0 0;color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:25px}
+.stat{background:#fffefa;border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 8px 30px rgba(15,23,42,.035);display:flex;align-items:center;gap:15px}
+.stat-icon{width:45px;height:45px;border-radius:14px;background:#eaf2e7;color:#17372d;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-number{font-size:25px;font-weight:850;line-height:1}
+.stat-label{color:var(--muted);font-size:12px;margin-top:5px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;padding:5px;background:#ece9e0;border-radius:14px;width:fit-content;max-width:100%;flex-wrap:wrap}
+.tab-btn{border:0;background:transparent;color:#667085;padding:10px 17px;border-radius:10px;font-size:12px;font-weight:800}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{background:#f3bd57;color:#1a271e;box-shadow:0 3px 12px rgba(23,55,45,.12)}
+.section{background:#fffefa;border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:18px;box-shadow:0 8px 35px rgba(15,23,42,.035)}
+.section-header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:20px}
+.section h2{margin:0;font-size:17px;letter-spacing:-.3px}
+.section-description{color:var(--muted);font-size:12px;margin-top:5px}
+.create-form{display:flex;gap:10px;align-items:center}
+.create-form input{flex:1;margin:0}
+.primary{border:0;background:#17372d;color:#fff;padding:12px 18px;border-radius:11px;font-weight:800;font-size:12px}
+.primary:hover{background:#20503f}
+.primary:disabled{opacity:.6;cursor:not-allowed}
+.group,.request{border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px}
+.group{transition:border-color .2s,box-shadow .2s}
+.group:hover{border-color:#b9c9bd;box-shadow:0 8px 25px rgba(15,23,42,.05)}
+.group:last-child,.request:last-child{margin-bottom:0}
+.group-top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
+.group-title{font-weight:850;font-size:15px}
+.group-id{color:var(--muted);font-size:11px;margin-top:5px}
+.code{display:inline-flex;align-items:center;gap:8px;background:#eef3ec;border:1px solid #dce6da;padding:8px 11px;color:#183b2c;border-radius:9px;margin-top:15px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:#334155}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.actions button{padding:9px 13px;border-radius:9px;border:0;font-size:11px;font-weight:800}
+.success{background:#dcfce7;color:#166534}
+.success:hover{background:#bbf7d0}
+.danger{background:#fee2e2;color:#b91c1c}
+.danger:hover{background:#fecaca}
+.warning{background:#fef3c7;color:#92400e}
+.warning:hover{background:#fde68a}
+.secondary{background:#eef3ec;color:#34483a}
+.secondary:hover{background:#dce6da}
+.request-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.request-user{font-size:13px;font-weight:800;word-break:break-all}
+.request-line{margin:8px 0;font-size:12px;color:#475467}
+.request-line strong{color:#101828}
+code{background:#eef3ec;border-radius:6px;padding:4px 7px;font-size:11px}
+.status{display:inline-flex;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:900;text-transform:uppercase}
+.pending{background:#fef3c7;color:#92400e}
+.approved{background:#dcfce7;color:#166534}
+.rejected,.threat{background:#fee2e2;color:#991b1b}
+.empty{padding:35px 20px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed #d0d5dd;border-radius:14px}
+.loading{padding:25px;text-align:center;color:var(--muted);font-size:12px}
+
+@media(max-width:700px){
+.topbar{height:auto;padding:16px 18px;align-items:flex-start}
+.topbar-right{gap:8px}
+.admin-email{display:none}
+.dashboard{padding:25px 15px 50px}
+.welcome h1{font-size:24px}
+.stats{grid-template-columns:1fr}
+.section{padding:17px;border-radius:16px}
+.create-form{flex-direction:column;align-items:stretch}
+.create-form input,.create-form button{width:100%}
+.group-top,.request-top{align-items:flex-start;flex-direction:column}
+.tabs{width:100%}
+.tab-btn{flex:1}
+.login-box{padding:28px 22px}
+}
+h1,h2,.brand-name,.topbar-title,.login-title{font-family:'Manrope',sans-serif}
+</style>
 </head>
-
 <body>
 
-<!-- ==================================================
-     LOGIN
-================================================== -->
-
+<!-- LOGIN -->
 <div id="loginPage" class="login-page">
-
   <div class="login-box">
-
     <div class="brand">
-
-      <div class="brand-icon">
-        C
-      </div>
-
+      <div class="brand-icon">C</div>
       <div>
-        <div class="brand-name">
-          Chatbot
-        </div>
-
-        <div class="brand-subtitle">
-          Təhlükəsiz qrup çat sistemi
-        </div>
+        <div class="brand-name">Chatbot</div>
+        <div class="brand-subtitle">Təhlükəsiz qrup çat sistemi</div>
       </div>
-
     </div>
 
-
-    <h1 class="login-title">
-      Admin paneli
-    </h1>
-
-    <p class="login-description">
-      İdarəetmə panelinə daxil olmaq üçün admin hesabınızla
-      giriş edin.
-    </p>
-
+    <h1 class="login-title">Admin paneli</h1>
+    <p class="login-description">İdarəetmə panelinə daxil olmaq üçün admin hesabınızla giriş edin.</p>
 
     <form id="loginForm">
-
       <div class="form-group">
-
-        <label class="form-label">
-          Admin email
-        </label>
-
+        <label class="form-label" for="email">Admin email</label>
         <div class="input-wrap">
-
-          <span class="input-icon">
-            ✉
-          </span>
-
-          <input
-            id="email"
-            type="email"
-            placeholder="Admin email"
-            autocomplete="username"
-            required
-          >
-
+          <span class="input-icon">✉</span>
+          <input id="email" type="email" placeholder="Admin email" autocomplete="username" required>
         </div>
-
       </div>
 
-
       <div class="form-group">
-
-        <label class="form-label">
-          Şifrə
-        </label>
-
+        <label class="form-label" for="password">Şifrə</label>
         <div class="input-wrap">
-
-          <span class="input-icon">
-            🔒
-          </span>
-
-          <input
-            id="password"
-            type="password"
-            placeholder="Şifrənizi daxil edin"
-            autocomplete="current-password"
-            required
-          >
-
-          <button
-            type="button"
-            id="passwordToggle"
-            class="password-toggle"
-            aria-label="Şifrəni göstər">
-            ◉
-          </button>
-
+          <span class="input-icon">🔒</span>
+          <input id="password" type="password" placeholder="Şifrənizi daxil edin" autocomplete="current-password" required>
+          <button type="button" id="passwordToggle" class="password-toggle" aria-label="Şifrəni göstər/gizlət">◉</button>
         </div>
-
       </div>
 
-
-      <button
-        id="loginButton"
-        class="login-button"
-        type="submit">
-        Daxil ol
-      </button>
-
+      <button id="loginButton" class="login-button" type="submit">Daxil ol</button>
     </form>
 
-
-    <div
-      id="loginError"
-      class="error hidden">
-    </div>
-
-
-    <div class="login-footer">
-      Yalnız səlahiyyətli admin hesabı üçün
-    </div>
-
+    <div id="loginError" class="error hidden"></div>
+    <div class="login-footer">Yalnız səlahiyyətli admin hesabı üçün</div>
   </div>
-
 </div>
 
-
-<!-- ==================================================
-     ADMIN PANEL
-================================================== -->
-
+<!-- ADMIN PANEL -->
 <div id="adminPage" class="admin-page hidden">
-
   <header class="topbar">
-
     <div class="topbar-left">
-
-      <div class="mini-logo">
-        C
-      </div>
-
+      <div class="mini-logo">C</div>
       <div>
-
-        <div class="topbar-title">
-          Chatbot Admin
-        </div>
-
-        <div class="topbar-subtitle">
-          Sistem idarəetmə paneli
-        </div>
-
+        <div class="topbar-title">Chatbot Admin</div>
+        <div class="topbar-subtitle">Sistem idarəetmə paneli</div>
       </div>
-
     </div>
-
-
     <div class="topbar-right">
-
       <div class="admin-account">
-
-        <div class="admin-avatar">
-          A
-        </div>
-
-        <div
-          id="adminEmail"
-          class="admin-email">
-        </div>
-
+        <div class="admin-avatar">A</div>
+        <div id="adminEmail" class="admin-email"></div>
       </div>
-
-
-      <button
-        id="logoutBtn"
-        class="logout">
-        Çıxış
-      </button>
-
+      <button id="logoutBtn" class="logout">Çıxış</button>
     </div>
-
   </header>
 
-
   <main class="dashboard">
-
     <div class="welcome">
-
-      <h1>
-        Xoş gəldiniz, Admin
-      </h1>
-
-      <p>
-        Qrupları və istifadəçi qoşulma sorğularını buradan idarə edin.
-      </p>
-
+      <h1>Xoş gəldiniz, Admin</h1>
+      <p>Qrupları və istifadəçi qoşulma sorğularını buradan idarə edin.</p>
     </div>
-
-
-    <!-- STATS -->
 
     <div class="stats">
-
       <div class="stat">
-
-        <div class="stat-icon">
-          👥
-        </div>
-
-        <div>
-
-          <div
-            id="groupCount"
-            class="stat-number">
-            0
-          </div>
-
-          <div class="stat-label">
-            Aktiv qrup
-          </div>
-
-        </div>
-
+        <div class="stat-icon">👥</div>
+        <div><div id="groupCount" class="stat-number">0</div><div class="stat-label">Aktiv qrup</div></div>
       </div>
-
-
       <div class="stat">
-
-        <div class="stat-icon">
-          🔔
-        </div>
-
-        <div>
-
-          <div
-            id="pendingCount"
-            class="stat-number">
-            0
-          </div>
-
-          <div class="stat-label">
-            Gözləyən sorğu
-          </div>
-
-        </div>
-
+        <div class="stat-icon">🔔</div>
+        <div><div id="pendingCount" class="stat-number">0</div><div class="stat-label">Gözləyən sorğu</div></div>
       </div>
-
     </div>
-
-
-    <!-- TABS -->
 
     <div class="tabs">
-
-      <button
-        class="tab-btn active"
-        data-tab="groupsTab">
-        Qruplar
-      </button>
-
-
-      <button
-        class="tab-btn"
-        data-tab="requestsTab">
-        Qoşulma sorğuları
-      </button>
-
+      <button class="tab-btn active" data-tab="groupsTab">Qruplar</button>
+      <button class="tab-btn" data-tab="requestsTab">Qoşulma sorğuları</button>
     </div>
 
-
-    <!-- ==================================================
-         GROUPS
-    ================================================== -->
-
-    <div
-      id="groupsTab"
-      class="tab-content">
-
+    <!-- GROUPS -->
+    <div id="groupsTab" class="tab-content">
       <div class="section">
-
         <div class="section-header">
-
           <div>
-
-            <h2>
-              Yeni qrup yarat
-            </h2>
-
-            <div class="section-description">
-              Yeni qrup yaradın və sistem avtomatik giriş kodu versin.
-            </div>
-
+            <h2>Yeni qrup yarat</h2>
+            <div class="section-description">Yeni qrup yaradın və sistem avtomatik giriş kodu versin.</div>
           </div>
-
         </div>
-
-
         <div class="create-form">
-
-          <input
-            id="groupName"
-            type="text"
-            placeholder="Məsələn: 160 HTML qrupu"
-          >
-
-          <button
-            id="createGroupBtn"
-            class="primary">
-            + Qrup yarat
-          </button>
-
+          <input id="groupName" type="text" placeholder="Məsələn: 160 HTML qrupu">
+          <button id="createGroupBtn" class="primary">+ Qrup yarat</button>
         </div>
-
-
         <div id="groupCreateMessage"></div>
-
       </div>
-
 
       <div class="section">
-
         <div class="section-header">
-
           <div>
-
-            <h2>
-              Qruplarım
-            </h2>
-
-            <div class="section-description">
-              Mövcud qrupları və giriş kodlarını idarə edin.
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div id="groupsList">
-          <div class="loading">
-            Yüklənir...
+            <h2>Qruplarım</h2>
+            <div class="section-description">Mövcud qrupları və giriş kodlarını idarə edin.</div>
           </div>
         </div>
-
+        <div id="groupsList"><div class="loading">Yüklənir...</div></div>
       </div>
-
     </div>
 
-
-    <!-- ==================================================
-         REQUESTS
-    ================================================== -->
-
-    <div
-      id="requestsTab"
-      class="tab-content hidden">
-
+    <!-- REQUESTS -->
+    <div id="requestsTab" class="tab-content hidden">
       <div class="section">
-
         <div class="section-header">
-
           <div>
-
-            <h2>
-              Qoşulma sorğuları
-            </h2>
-
-            <div class="section-description">
-              İstifadəçilərin qrupa qoşulma cəhdlərini yoxlayın.
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div id="requestsList">
-          <div class="loading">
-            Yüklənir...
+            <h2>Qoşulma sorğuları</h2>
+            <div class="section-description">İstifadəçilərin qrupa qoşulma cəhdlərini yoxlayın.</div>
           </div>
         </div>
-
+        <div id="requestsList"><div class="loading">Yüklənir...</div></div>
       </div>
-
     </div>
-
   </main>
-
 </div>
 
-
 <script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
 
-import { createClient }
-from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-import {
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-}
-from "./supabase-config.js";
+const $ = id => document.getElementById(id);
+const loginPage = $("loginPage");
+const adminPage = $("adminPage");
+const loginError = $("loginError");
+const loginButton = $("loginButton");
 
-
-const supabase =
-  createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-/* ==================================================
-   ELEMENTS
-================================================== */
-
-const loginPage =
-  document.getElementById("loginPage");
-
-const adminPage =
-  document.getElementById("adminPage");
-
-const loginError =
-  document.getElementById("loginError");
-
-const adminEmail =
-  document.getElementById("adminEmail");
-
-const loginButton =
-  document.getElementById("loginButton");
-
-
-/* ==================================================
-   LOGIN ERROR
-================================================== */
-
-function showLoginError(message) {
-
-  loginError.textContent = message;
-
-  loginError.classList.remove("hidden");
-
+function escapeHtml(value){
+  if(value === null || value === undefined) return "";
+  return String(value)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
+const showLoginError = msg => { loginError.textContent = msg; loginError.classList.remove("hidden"); };
+const hideLoginError = () => loginError.classList.add("hidden");
 
-function hideLoginError() {
+/* ===== ŞİFRƏ GÖSTƏR/GİZLƏT ===== */
+$("passwordToggle").addEventListener("click", () => {
+  const p = $("password");
+  p.type = p.type === "password" ? "text" : "password";
+});
 
-  loginError.classList.add("hidden");
+/* ===== ADMIN YOXLAMASI ===== */
+async function checkAdmin(){
+  const { data:{ user } } = await supabase.auth.getUser();
 
-}
-
-
-/* ==================================================
-   PASSWORD SHOW/HIDE
-================================================== */
-
-document
-  .getElementById("passwordToggle")
-  .addEventListener("click", () => {
-
-    const password =
-      document.getElementById("password");
-
-    if (password.type === "password") {
-
-      password.type = "text";
-
-    } else {
-
-      password.type = "password";
-
-    }
-
-  });
-
-
-/* ==================================================
-   ADMIN CHECK
-================================================== */
-
-async function checkAdmin() {
-
-  const {
-    data: {
-      user
-    }
-  } = await supabase.auth.getUser();
-
-
-  if (!user) {
-
+  if(!user){
     loginPage.classList.remove("hidden");
-
     adminPage.classList.add("hidden");
-
     return false;
-
   }
 
+  const { data, error } = await supabase.rpc("is_admin");
 
-  const {
-    data,
-    error
-  } = await supabase.rpc("is_admin");
-
-
-  if (error || data !== true) {
-
+  if(error || data !== true){
     await supabase.auth.signOut();
-
     loginPage.classList.remove("hidden");
-
     adminPage.classList.add("hidden");
-
-    showLoginError(
-      "Bu hesabın admin panelinə giriş icazəsi yoxdur."
-    );
-
+    showLoginError("Bu hesabın admin panelinə giriş icazəsi yoxdur.");
     return false;
-
   }
 
-
-  adminEmail.textContent =
-    user.email;
-
-
+  $("adminEmail").textContent = user.email;
   loginPage.classList.add("hidden");
-
   adminPage.classList.remove("hidden");
-
   return true;
-
 }
 
+/* ===== LOGIN ===== */
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  hideLoginError();
 
-/* ==================================================
-   LOGIN
-================================================== */
+  loginButton.disabled = true;
+  loginButton.textContent = "Yoxlanılır...";
 
-document
-  .getElementById("loginForm")
-  .addEventListener(
-    "submit",
-    async (e) => {
-
-      e.preventDefault();
-
-      hideLoginError();
-
-      loginButton.disabled = true;
-
-      loginButton.textContent =
-        "Yoxlanılır...";
-
-
-      const email =
-        document
-          .getElementById("email")
-          .value
-          .trim();
-
-
-      const password =
-        document
-          .getElementById("password")
-          .value;
-
-
-      const {
-        error
-      } =
-        await supabase.auth.signInWithPassword({
-
-          email,
-          password
-
-        });
-
-
-      if (error) {
-
-        showLoginError(
-          "Email və ya şifrə yanlışdır."
-        );
-
-        loginButton.disabled = false;
-
-        loginButton.textContent =
-          "Daxil ol";
-
-        return;
-
-      }
-
-
-      const allowed =
-        await checkAdmin();
-
-
-      if (allowed) {
-
-        await loadGroups();
-
-        await loadRequests();
-
-      }
-
-
-      loginButton.disabled = false;
-
-      loginButton.textContent =
-        "Daxil ol";
-
-    }
-  );
-
-
-/* ==================================================
-   LOGOUT
-================================================== */
-
-document
-  .getElementById("logoutBtn")
-  .addEventListener(
-    "click",
-    async () => {
-
-      await supabase.auth.signOut();
-
-      location.reload();
-
-    }
-  );
-
-
-/* ==================================================
-   TABS
-================================================== */
-
-document
-  .querySelectorAll(".tab-btn")
-  .forEach(btn => {
-
-    btn.addEventListener(
-      "click",
-      () => {
-
-        document
-          .querySelectorAll(".tab-btn")
-          .forEach(x => {
-
-            x.classList.remove("active");
-
-          });
-
-
-        btn.classList.add("active");
-
-
-        document
-          .querySelectorAll(".tab-content")
-          .forEach(x => {
-
-            x.classList.add("hidden");
-
-          });
-
-
-        document
-          .getElementById(
-            btn.dataset.tab
-          )
-          .classList.remove("hidden");
-
-      }
-    );
-
+  const { error } = await supabase.auth.signInWithPassword({
+    email: $("email").value.trim(),
+    password: $("password").value
   });
 
-
-/* ==================================================
-   GROUPS
-================================================== */
-
-async function loadGroups() {
-
-  const container =
-    document.getElementById(
-      "groupsList"
-    );
-
-
-  container.innerHTML =
-    `
-      <div class="loading">
-        Qruplar yüklənir...
-      </div>
-    `;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from("groups")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    container.innerHTML = `
-      <div class="error">
-        ${escapeHtml(error.message)}
-      </div>
-    `;
-
+  if(error){
+    showLoginError("Email və ya şifrə yanlışdır.");
+    loginButton.disabled = false;
+    loginButton.textContent = "Daxil ol";
     return;
-
   }
 
-
-  document.getElementById(
-    "groupCount"
-  ).textContent =
-    data ? data.length : 0;
-
-
-  if (!data || data.length === 0) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Hələ heç bir qrup yaradılmayıb.
-      </div>
-    `;
-
-    return;
-
+  if(await checkAdmin()){
+    await loadGroups();
+    await loadRequests();
   }
 
+  loginButton.disabled = false;
+  loginButton.textContent = "Daxil ol";
+});
+
+/* ===== LOGOUT ===== */
+$("logoutBtn").addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  location.reload();
+});
+
+/* ===== TABS ===== */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".tab-content").forEach(x => x.classList.add("hidden"));
+    $(btn.dataset.tab).classList.remove("hidden");
+  });
+});
+
+/* ===== DÜYMƏ HADİSƏLƏRİ (inline onclick əvəzinə) ===== */
+document.addEventListener("click", e => {
+  const b = e.target.closest("button[data-action]");
+  if(!b) return;
+  const { action, id, decision, group } = b.dataset;
+  if(action === "rotate") rotateCode(id);
+  if(action === "delete") deleteGroup(id);
+  if(action === "review") reviewRequest(id, decision, group || "");
+});
+
+/* ===== QRUPLAR ===== */
+async function loadGroups(){
+  const container = $("groupsList");
+  container.innerHTML = '<div class="loading">Qruplar yüklənir...</div>';
+
+  const { data, error } = await supabase
+    .from("groups").select("*").order("created_at", { ascending:false });
+
+  if(error){
+    container.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  $("groupCount").textContent = data ? data.length : 0;
+
+  if(!data || data.length === 0){
+    container.innerHTML = '<div class="empty">Hələ heç bir qrup yaradılmayıb.</div>';
+    return;
+  }
 
   container.innerHTML = "";
-
 
   data.forEach(group => {
-
-    const div =
-      document.createElement(
-        "div"
-      );
-
-    div.className =
-      "group";
-
-
+    const div = document.createElement("div");
+    div.className = "group";
     div.innerHTML = `
-
       <div class="group-top">
-
         <div>
-
-          <div class="group-title">
-            ${escapeHtml(group.name)}
-          </div>
-
-          <div class="group-id">
-            Qrup ID: ${escapeHtml(group.id)}
-          </div>
-
+          <div class="group-title">${escapeHtml(group.name)}</div>
+          <div class="group-id">Qrup ID: ${escapeHtml(group.id)}</div>
         </div>
-
       </div>
-
-
-      <div class="code">
-        🔑
-        Kod:
-        <strong>
-          ${escapeHtml(group.invite_code)}
-        </strong>
-      </div>
-
-
+      <div class="code">🔑 Kod: <strong>${escapeHtml(group.invite_code)}</strong></div>
       <div class="actions">
-
-        <button
-          class="warning"
-          onclick="rotateCode('${group.id}')">
-          🔄 Kodu dəyiş
-        </button>
-
-
-        <button
-          class="danger"
-          onclick="deleteGroup('${group.id}')">
-          🗑️ Qrupu sil
-        </button>
-
-      </div>
-
-    `;
-
-
+        <button class="warning" data-action="rotate" data-id="${escapeHtml(group.id)}">🔄 Kodu dəyiş</button>
+        <button class="danger" data-action="delete" data-id="${escapeHtml(group.id)}">🗑️ Qrupu sil</button>
+      </div>`;
     container.appendChild(div);
-
   });
-
 }
 
+/* ===== QRUP YARAT ===== */
+$("createGroupBtn").addEventListener("click", async () => {
+  const name = $("groupName").value.trim();
+  const msg = $("groupCreateMessage");
 
-/* ==================================================
-   CREATE GROUP
-================================================== */
-
-document
-  .getElementById("createGroupBtn")
-  .addEventListener(
-    "click",
-    async () => {
-
-      const name =
-        document
-          .getElementById("groupName")
-          .value
-          .trim();
-
-
-      if (!name) {
-
-        alert(
-          "Qrup adını yaz."
-        );
-
-        return;
-
-      }
-
-
-      const button =
-        document.getElementById(
-          "createGroupBtn"
-        );
-
-
-      button.disabled = true;
-
-      button.textContent =
-        "Yaradılır...";
-
-
-      const {
-        error
-      } =
-        await supabase.rpc(
-          "create_chat_group",
-          {
-            group_name:
-              name
-          }
-        );
-
-
-      button.disabled = false;
-
-      button.textContent =
-        "+ Qrup yarat";
-
-
-      if (error) {
-
-        document.getElementById(
-          "groupCreateMessage"
-        ).innerHTML = `
-
-          <div class="error">
-            ${escapeHtml(
-              error.message
-            )}
-          </div>
-
-        `;
-
-        return;
-
-      }
-
-
-      document.getElementById(
-        "groupName"
-      ).value = "";
-
-
-      document.getElementById(
-        "groupCreateMessage"
-      ).innerHTML = `
-
-        <div class="success-box">
-          ✓ Qrup uğurla yaradıldı.
-        </div>
-
-      `;
-
-
-      await loadGroups();
-
-    }
-  );
-
-
-/* ==================================================
-   ROTATE GROUP CODE
-================================================== */
-
-window.rotateCode =
-async function(groupId) {
-
-  if (
-    !confirm(
-      "Bu qrupun kodunu dəyişmək istəyirsiniz?"
-    )
-  ) {
-
+  if(!name){
+    msg.innerHTML = '<div class="error">Qrup adını yazın.</div>';
     return;
-
   }
 
+  const button = $("createGroupBtn");
+  button.disabled = true;
+  button.textContent = "Yaradılır...";
 
-  const {
-    error
-  } =
-    await supabase.rpc(
-      "rotate_group_code",
-      {
-        target_group:
-          groupId
-      }
-    );
+  const { error } = await supabase.rpc("create_chat_group", { group_name: name });
 
+  button.disabled = false;
+  button.textContent = "+ Qrup yarat";
 
-  if (error) {
-
-    alert(
-      error.message
-    );
-
+  if(error){
+    msg.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
     return;
-
   }
 
+  $("groupName").value = "";
+  msg.innerHTML = '<div class="success-box">✓ Qrup uğurla yaradıldı.</div>';
+  await loadGroups();
+});
 
-  alert(
-    "Qrup kodu dəyişdirildi."
-  );
+/* ===== KODU DƏYİŞ ===== */
+async function rotateCode(groupId){
+  if(!confirm("Bu qrupun kodunu dəyişmək istəyirsiniz?")) return;
 
+  const { error } = await supabase.rpc("rotate_group_code", { target_group: groupId });
+  if(error) return alert(error.message);
+
+  alert("Qrup kodu dəyişdirildi.");
+  await loadGroups();
+}
+
+/* ===== QRUPU SİL ===== */
+async function deleteGroup(groupId){
+  if(!confirm("Bu qrupu tamamilə silmək istəyirsiniz?")) return;
+
+  const { error } = await supabase.rpc("delete_chat_group", { target_group: groupId });
+  if(error) return alert(error.message);
 
   await loadGroups();
-
-};
-
-
-/* ==================================================
-   DELETE GROUP
-================================================== */
-
-window.deleteGroup =
-async function(groupId) {
-
-  if (
-    !confirm(
-      "Bu qrupu tamamilə silmək istəyirsiniz?"
-    )
-  ) {
-
-    return;
-
-  }
-
-
-  const {
-    error
-  } =
-    await supabase.rpc(
-      "delete_chat_group",
-      {
-        target_group:
-          groupId
-      }
-    );
-
-
-  if (error) {
-
-    alert(
-      error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadGroups();
-
   await loadRequests();
+}
 
-};
+/* ===== QOŞULMA SORĞULARI ===== */
+async function loadRequests(){
+  const container = $("requestsList");
+  container.innerHTML = '<div class="loading">Sorğular yüklənir...</div>';
 
+  const { data, error } = await supabase
+    .from("join_requests")
+    .select("id,user_id,group_id,entered_code,status,created_at")
+    .order("created_at", { ascending:false });
 
-/* ==================================================
-   JOIN REQUESTS
-================================================== */
-
-async function loadRequests() {
-
-  const container =
-    document.getElementById(
-      "requestsList"
-    );
-
-
-  container.innerHTML = `
-    <div class="loading">
-      Sorğular yüklənir...
-    </div>
-  `;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from("join_requests")
-      .select(`
-        id,
-        user_id,
-        group_id,
-        entered_code,
-        status,
-        created_at
-      `)
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    container.innerHTML = `
-      <div class="error">
-        ${escapeHtml(
-          error.message
-        )}
-      </div>
-    `;
-
+  if(error){
+    container.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
     return;
-
   }
 
+  $("pendingCount").textContent = (data || []).filter(x => x.status === "pending").length;
 
-  const pending =
-    (data || [])
-      .filter(
-        x =>
-          x.status === "pending"
-      )
-      .length;
-
-
-  document.getElementById(
-    "pendingCount"
-  ).textContent =
-    pending;
-
-
-  if (!data || data.length === 0) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Heç bir qoşulma sorğusu yoxdur.
-      </div>
-    `;
-
+  if(!data || data.length === 0){
+    container.innerHTML = '<div class="empty">Heç bir qoşulma sorğusu yoxdur.</div>';
     return;
-
   }
 
+  // Qrup adlarını bir sorğu ilə al (hər sorğu üçün ayrıca yox)
+  const { data: gs } = await supabase.from("groups").select("id,name");
+  const names = new Map((gs || []).map(g => [g.id, g.name]));
 
   container.innerHTML = "";
 
+  for(const request of data){
+    const div = document.createElement("div");
+    div.className = "request";
 
-  for (
-    const request
-    of data
-  ) {
+    const groupName = names.get(request.group_id) || "Naməlum qrup";
+    const gid = escapeHtml(request.group_id || "");
+    const rid = escapeHtml(request.id);
 
-    const div =
-      document.createElement(
-        "div"
-      );
-
-
-    div.className =
-      "request";
-
-
-    let groupName =
-      "Naməlum qrup";
-
-
-    if (
-      request.group_id
-    ) {
-
-      const {
-        data: group
-      } =
-        await supabase
-          .from("groups")
-          .select("name")
-          .eq(
-            "id",
-            request.group_id
-          )
-          .maybeSingle();
-
-
-      if (group) {
-
-        groupName =
-          group.name;
-
-      }
-
-    }
-
+    const actions = request.status === "pending" ? `
+      <div class="actions">
+        <button class="success" data-action="review" data-decision="approved" data-id="${rid}" data-group="${gid}">✓ Təsdiqlə</button>
+        <button class="secondary" data-action="review" data-decision="rejected" data-id="${rid}" data-group="${gid}">✕ Rədd et</button>
+        ${request.group_id ? `<button class="danger" data-action="review" data-decision="threat" data-id="${rid}" data-group="${gid}">⚠ Təhlükə</button>` : ""}
+      </div>` : "";
 
     div.innerHTML = `
-
       <div class="request-top">
-
-        <div class="request-user">
-
-          👤
-          ${escapeHtml(
-            request.user_id
-          )}
-
-        </div>
-
-
-        <span class="status ${escapeHtml(request.status)}">
-          ${escapeHtml(
-            request.status
-          )}
-        </span>
-
+        <div class="request-user">👤 ${escapeHtml(request.user_id)}</div>
+        <span class="status ${escapeHtml(request.status)}">${escapeHtml(request.status)}</span>
       </div>
+      <div class="request-line"><strong>Qrup:</strong> ${escapeHtml(groupName)}</div>
+      <div class="request-line"><strong>Daxil edilən kod:</strong> <code>${escapeHtml(request.entered_code || "-")}</code></div>
+      <div class="request-line"><strong>Tarix:</strong> ${escapeHtml(new Date(request.created_at).toLocaleString("az-AZ"))}</div>
+      ${actions}`;
 
-
-      <div class="request-line">
-
-        <strong>
-          Qrup:
-        </strong>
-
-        ${escapeHtml(
-          groupName
-        )}
-
-      </div>
-
-
-      <div class="request-line">
-
-        <strong>
-          Daxil edilən kod:
-        </strong>
-
-        <code>
-          ${escapeHtml(
-            request.entered_code ||
-            "-"
-          )}
-        </code>
-
-      </div>
-
-
-      <div class="request-line">
-
-        <strong>
-          Tarix:
-        </strong>
-
-        ${escapeHtml(
-          new Date(
-            request.created_at
-          ).toLocaleString(
-            "az-AZ"
-          )
-        )}
-
-      </div>
-
-
-      ${
-        request.status === "pending"
-        ?
-
-        `
-
-          <div class="actions">
-
-            <button
-              class="success"
-              onclick="reviewRequest(
-                '${request.id}',
-                'approved',
-                '${request.group_id || ""}'
-              )">
-              ✓ Təsdiqlə
-            </button>
-
-
-            <button
-              class="secondary"
-              onclick="reviewRequest(
-                '${request.id}',
-                'rejected',
-                '${request.group_id || ""}'
-              )">
-              ✕ Rədd et
-            </button>
-
-
-            ${
-              request.group_id
-              ?
-
-              `
-
-                <button
-                  class="danger"
-                  onclick="reviewRequest(
-                    '${request.id}',
-                    'threat',
-                    '${request.group_id}'
-                  )">
-                  ⚠ Təhlükə
-                </button>
-
-              `
-
-              :
-
-              ""
-            }
-
-          </div>
-
-        `
-
-        :
-
-        ""
-
-      }
-
-    `;
-
-
-    container.appendChild(
-      div
-    );
-
+    container.appendChild(div);
   }
-
 }
 
+/* ===== SORĞUNU YOXLA ===== */
+async function reviewRequest(requestId, decision, groupId){
+  let message = "Sorğunu təsdiqləmək istəyirsiniz?";
+  if(decision === "rejected") message = "Sorğunu rədd etmək istəyirsiniz?";
+  if(decision === "threat") message = "Bu sorğunu təhlükə kimi işarələmək və qrup kodunu dəyişmək istəyirsiniz?";
 
-/* ==================================================
-   REVIEW REQUEST
-================================================== */
+  if(!confirm(message)) return;
 
-window.reviewRequest =
-async function(
-  requestId,
-  decision,
-  groupId
-) {
+  const { error } = await supabase.rpc("review_join_request", {
+    target_request: requestId,
+    decision
+  });
+  if(error) return alert(error.message);
 
-  let message =
-    "Sorğunu təsdiqləmək istəyirsiniz?";
+  // Təhlükədirsə qrup kodunu da dəyiş
+  if(decision === "threat" && groupId){
+    const { error: rotateError } = await supabase.rpc("rotate_group_code", { target_group: groupId });
 
-
-  if (
-    decision === "rejected"
-  ) {
-
-    message =
-      "Sorğunu rədd etmək istəyirsiniz?";
-
-  }
-
-
-  if (
-    decision === "threat"
-  ) {
-
-    message =
-      "Bu sorğunu təhlükə kimi işarələmək və qrup kodunu dəyişmək istəyirsiniz?";
-
-  }
-
-
-  if (
-    !confirm(
-      message
-    )
-  ) {
-
-    return;
-
-  }
-
-
-  const {
-    error
-  } =
-    await supabase.rpc(
-      "review_join_request",
-      {
-        target_request:
-          requestId,
-
-        decision:
-          decision
-      }
-    );
-
-
-  if (error) {
-
-    alert(
-      error.message
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * Təhlükədirsə,
-   * qrup kodunu da dəyişirik.
-   */
-
-  if (
-    decision === "threat" &&
-    groupId
-  ) {
-
-    const {
-      error:
-        rotateError
-    } =
-      await supabase.rpc(
-        "rotate_group_code",
-        {
-          target_group:
-            groupId
-        }
-      );
-
-
-    if (rotateError) {
-
-      alert(
-        "Sorğu təhlükə kimi işarələndi, amma qrup kodu dəyişdirilə bilmədi: " +
-        rotateError.message
-      );
-
+    if(rotateError){
+      alert("Sorğu təhlükə kimi işarələndi, amma qrup kodu dəyişdirilə bilmədi: " + rotateError.message);
       await loadRequests();
-
       return;
-
     }
-
   }
-
 
   await loadRequests();
-
   await loadGroups();
-
-};
-
-
-/* ==================================================
-   REALTIME JOIN REQUESTS
-================================================== */
-
-supabase
-  .channel(
-    "admin-join-requests"
-  )
-  .on(
-    "postgres_changes",
-    {
-      event: "*",
-      schema: "public",
-      table: "join_requests"
-    },
-    async () => {
-
-      if (
-        !adminPage.classList.contains(
-          "hidden"
-        )
-      ) {
-
-        await loadRequests();
-
-      }
-
-    }
-  )
-  .subscribe();
-
-
-/* ==================================================
-   ESCAPE HTML
-================================================== */
-
-function escapeHtml(
-  value
-) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return "";
-
-  }
-
-
-  return String(value)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
 }
 
+/* ===== REALTIME (debounce ilə) ===== */
+let rtTimer;
+supabase
+  .channel("admin-join-requests")
+  .on("postgres_changes", { event:"*", schema:"public", table:"join_requests" }, () => {
+    clearTimeout(rtTimer);
+    rtTimer = setTimeout(() => {
+      if(!adminPage.classList.contains("hidden")) loadRequests();
+    }, 300);
+  })
+  .subscribe();
 
-/* ==================================================
-   START
-================================================== */
-
+/* ===== START ===== */
 (async () => {
-
-  const allowed =
-    await checkAdmin();
-
-
-  if (allowed) {
-
+  if(await checkAdmin()){
     await loadGroups();
-
     await loadRequests();
-
   }
-
 })();
-
 </script>
-
 </body>
 </html>
-
