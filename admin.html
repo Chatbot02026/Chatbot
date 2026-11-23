@@ -13,354 +13,1320 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #101828;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --dark: #111827;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      --radius: 20px;
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      color: #111;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(37, 99, 235, 0.07),
+          transparent 35%
+        ),
+        var(--bg);
+
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     .hidden {
       display: none !important;
     }
 
+    /* =========================
+       LOGIN
+    ========================= */
+
     .login-page {
       min-height: 100vh;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+
+      padding: 24px;
+
+      position: relative;
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 15% 20%,
+          rgba(37, 99, 235, 0.18),
+          transparent 32%
+        ),
+        radial-gradient(
+          circle at 85% 80%,
+          rgba(124, 58, 237, 0.14),
+          transparent 35%
+        ),
+        #f8fafc;
+    }
+
+    .login-page::before {
+      content: "";
+      position: absolute;
+
+      width: 420px;
+      height: 420px;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.55);
+
+      top: -220px;
+      right: -150px;
+
+      filter: blur(10px);
+    }
+
+    .login-page::after {
+      content: "";
+      position: absolute;
+
+      width: 300px;
+      height: 300px;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.45);
+
+      bottom: -150px;
+      left: -100px;
+
+      filter: blur(10px);
     }
 
     .login-box {
       width: 100%;
-      max-width: 420px;
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.08);
+      max-width: 430px;
+
+      background: rgba(255, 255, 255, 0.94);
+
+      border: 1px solid rgba(255, 255, 255, 0.8);
+
+      border-radius: 28px;
+
+      padding: 38px;
+
+      box-shadow:
+        0 30px 90px rgba(15, 23, 42, 0.13),
+        0 4px 15px rgba(15, 23, 42, 0.04);
+
+      position: relative;
+      z-index: 2;
+
+      backdrop-filter: blur(20px);
     }
 
-    .logo {
-      font-size: 30px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+
+      margin-bottom: 30px;
+    }
+
+    .brand-icon {
+      width: 50px;
+      height: 50px;
+
+      border-radius: 15px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #7c3aed
+        );
+
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 21px;
+      font-weight: 900;
+
+      box-shadow:
+        0 12px 25px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-name {
+      font-size: 24px;
+      font-weight: 850;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .login-title {
+      font-size: 28px;
       font-weight: 800;
+
+      margin: 0 0 8px;
+
+      letter-spacing: -0.7px;
+    }
+
+    .login-description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+
+      margin: 0 0 28px;
+    }
+
+    .form-group {
+      margin-bottom: 17px;
+    }
+
+    .form-label {
+      display: block;
+
+      font-size: 13px;
+      font-weight: 700;
+
       margin-bottom: 8px;
     }
 
-    .subtitle {
-      color: #777;
-      margin-bottom: 25px;
+    .input-wrap {
+      position: relative;
     }
 
-    input,
-    button,
-    select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
+    .input-wrap input {
+      padding-left: 44px;
+      padding-right: 45px;
+    }
+
+    .input-icon {
+      position: absolute;
+
+      left: 15px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      color: #98a2b3;
+
       font-size: 15px;
+
+      pointer-events: none;
     }
 
     input {
-      margin-bottom: 12px;
+      width: 100%;
+
+      padding: 14px 15px;
+
+      border: 1px solid var(--border);
+
+      border-radius: 13px;
+
+      outline: none;
+
+      background: #fff;
+
+      color: var(--text);
+
+      font-size: 14px;
+
+      transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
     }
 
-    button {
+    input::placeholder {
+      color: #98a2b3;
+    }
+
+    input:focus {
+      border-color: #93b4ff;
+
+      box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.09);
+    }
+
+    .password-toggle {
+      position: absolute;
+
+      right: 11px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
       border: 0;
-      cursor: pointer;
-      font-weight: 600;
+
+      background: transparent;
+
+      width: 34px;
+      height: 34px;
+
+      color: #667085;
+
+      padding: 0;
     }
 
-    .primary {
-      background: #111;
+    .password-toggle:hover {
+      color: var(--dark);
+    }
+
+    .login-button {
+      width: 100%;
+
+      border: 0;
+
+      padding: 14px 16px;
+
+      border-radius: 13px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #4f46e5
+        );
+
       color: white;
+
+      font-size: 14px;
+      font-weight: 800;
+
+      box-shadow:
+        0 12px 25px rgba(37, 99, 235, 0.22);
+
+      transition:
+        transform 0.15s,
+        box-shadow 0.15s,
+        opacity 0.15s;
     }
 
-    .danger {
-      background: #dc3545;
-      color: white;
+    .login-button:hover {
+      transform: translateY(-1px);
+
+      box-shadow:
+        0 15px 30px rgba(37, 99, 235, 0.28);
     }
 
-    .success {
-      background: #198754;
-      color: white;
+    .login-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .warning {
-      background: #f0ad4e;
-      color: white;
-    }
+    .login-footer {
+      margin-top: 25px;
 
-    .secondary {
-      background: #e9ecef;
-      color: #111;
+      text-align: center;
+
+      font-size: 12px;
+
+      color: #98a2b3;
     }
 
     .error {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 10px;
-      background: #ffe5e5;
-      color: #a40000;
+      margin-top: 15px;
+
+      padding: 12px 14px;
+
+      border-radius: 12px;
+
+      background: #fef2f2;
+
+      border: 1px solid #fecaca;
+
+      color: #b91c1c;
+
+      font-size: 13px;
+
+      line-height: 1.5;
     }
 
     .success-box {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 10px;
-      background: #e5f8ed;
-      color: #08733b;
+      margin-top: 15px;
+
+      padding: 12px 14px;
+
+      border-radius: 12px;
+
+      background: #f0fdf4;
+
+      border: 1px solid #bbf7d0;
+
+      color: #15803d;
+
+      font-size: 13px;
     }
+
+    /* =========================
+       ADMIN
+    ========================= */
 
     .admin-page {
       min-height: 100vh;
     }
 
-    header {
-      background: #111;
-      color: white;
-      padding: 18px 25px;
+    .topbar {
+      height: 74px;
+
+      background: rgba(255, 255, 255, 0.94);
+
+      border-bottom: 1px solid var(--border);
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+
+      padding: 0 30px;
+
+      position: sticky;
+      top: 0;
+
+      z-index: 20;
+
+      backdrop-filter: blur(15px);
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .mini-logo {
+      width: 40px;
+      height: 40px;
+
+      border-radius: 12px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #7c3aed
+        );
+
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-weight: 900;
+      font-size: 17px;
+    }
+
+    .topbar-title {
+      font-weight: 850;
+      font-size: 17px;
+    }
+
+    .topbar-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .admin-account {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .admin-avatar {
+      width: 35px;
+      height: 35px;
+
+      border-radius: 50%;
+
+      background: #eef2ff;
+
+      color: #4338ca;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-weight: 800;
+      font-size: 13px;
     }
 
     .admin-email {
-      font-size: 13px;
-      color: #bbb;
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .logout {
       width: auto;
-      background: #333;
-      color: white;
+
+      border: 1px solid var(--border);
+
+      background: white;
+
+      color: #344054;
+
       padding: 9px 14px;
+
+      border-radius: 10px;
+
+      font-weight: 700;
+
+      font-size: 12px;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 20px;
+    .logout:hover {
+      background: #f8fafc;
+    }
+
+    .dashboard {
+      max-width: 1300px;
+
+      margin: 0 auto;
+
+      padding: 34px 25px 60px;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+      margin: 0;
+
+      font-size: 29px;
+
+      letter-spacing: -0.8px;
+    }
+
+    .welcome p {
+      margin: 7px 0 0;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+    .stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 16px;
+
+      margin-bottom: 25px;
+    }
+
+    .stat {
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 18px;
+
+      padding: 20px;
+
+      box-shadow:
+        0 8px 30px rgba(15, 23, 42, 0.035);
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 15px;
+    }
+
+    .stat-icon {
+      width: 45px;
+      height: 45px;
+
+      border-radius: 14px;
+
+      background: #eff6ff;
+
+      color: #2563eb;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 18px;
+
+      flex-shrink: 0;
+    }
+
+    .stat-number {
+      font-size: 25px;
+
+      font-weight: 850;
+
+      line-height: 1;
+    }
+
+    .stat-label {
+      color: var(--muted);
+
+      font-size: 12px;
+
+      margin-top: 5px;
     }
 
     .tabs {
       display: flex;
-      gap: 10px;
+
+      gap: 8px;
+
       margin-bottom: 20px;
+
+      padding: 5px;
+
+      background: #eef1f6;
+
+      border-radius: 14px;
+
+      width: fit-content;
+
+      max-width: 100%;
+
       flex-wrap: wrap;
     }
 
     .tab-btn {
       width: auto;
-      background: white;
-      border: 1px solid #ddd;
+
+      border: 0;
+
+      background: transparent;
+
+      color: #667085;
+
+      padding: 10px 17px;
+
+      border-radius: 10px;
+
+      font-size: 12px;
+
+      font-weight: 800;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
     }
 
     .tab-btn.active {
-      background: #111;
-      color: white;
+      background: white;
+
+      color: #111827;
+
+      box-shadow:
+        0 3px 12px rgba(15, 23, 42, 0.08);
     }
 
     .section {
       background: white;
-      border-radius: 16px;
-      padding: 22px;
+
+      border: 1px solid var(--border);
+
+      border-radius: 20px;
+
+      padding: 24px;
+
+      margin-bottom: 18px;
+
+      box-shadow:
+        0 8px 35px rgba(15, 23, 42, 0.035);
+    }
+
+    .section-header {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+
       margin-bottom: 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,.04);
     }
 
     .section h2 {
-      margin-top: 0;
+      margin: 0;
+
+      font-size: 17px;
+
+      letter-spacing: -0.3px;
     }
 
+    .section-description {
+      color: var(--muted);
+
+      font-size: 12px;
+
+      margin-top: 5px;
+    }
+
+    .create-form {
+      display: flex;
+
+      gap: 10px;
+
+      align-items: center;
+    }
+
+    .create-form input {
+      flex: 1;
+      margin: 0;
+    }
+
+    .primary {
+      border: 0;
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #4f46e5
+        );
+
+      color: white;
+
+      padding: 12px 18px;
+
+      border-radius: 11px;
+
+      font-weight: 800;
+
+      font-size: 12px;
+
+      width: auto;
+    }
+
+    .primary:hover {
+      opacity: 0.92;
+    }
+
+    /* GROUP */
+
     .group {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 15px;
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      padding: 18px;
+
       margin-bottom: 12px;
+
+      transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+    }
+
+    .group:hover {
+      border-color: #cbd5e1;
+
+      box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.05);
+    }
+
+    .group:last-child {
+      margin-bottom: 0;
+    }
+
+    .group-top {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-start;
+
+      gap: 15px;
     }
 
     .group-title {
-      font-weight: 700;
-      font-size: 17px;
+      font-weight: 850;
+
+      font-size: 15px;
+    }
+
+    .group-id {
+      color: var(--muted);
+
+      font-size: 11px;
+
+      margin-top: 5px;
     }
 
     .code {
-      display: inline-block;
-      background: #f1f1f1;
-      padding: 7px 10px;
-      border-radius: 8px;
-      margin-top: 8px;
-      font-family: monospace;
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      background: #f8fafc;
+
+      border: 1px solid #e2e8f0;
+
+      padding: 8px 11px;
+
+      border-radius: 9px;
+
+      margin-top: 15px;
+
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+      font-size: 12px;
+
+      color: #334155;
     }
 
     .actions {
       display: flex;
+
       gap: 8px;
+
       flex-wrap: wrap;
-      margin-top: 12px;
+
+      margin-top: 14px;
     }
 
     .actions button {
       width: auto;
+
+      padding: 9px 13px;
+
+      border-radius: 9px;
+
+      border: 0;
+
+      font-size: 11px;
+
+      font-weight: 800;
     }
 
+    .success {
+      background: #dcfce7;
+
+      color: #166534;
+    }
+
+    .success:hover {
+      background: #bbf7d0;
+    }
+
+    .danger {
+      background: #fee2e2;
+
+      color: #b91c1c;
+    }
+
+    .danger:hover {
+      background: #fecaca;
+    }
+
+    .warning {
+      background: #fef3c7;
+
+      color: #92400e;
+    }
+
+    .warning:hover {
+      background: #fde68a;
+    }
+
+    .secondary {
+      background: #f1f5f9;
+
+      color: #334155;
+    }
+
+    .secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* REQUEST */
+
     .request {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 15px;
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      padding: 18px;
+
       margin-bottom: 12px;
     }
 
+    .request:last-child {
+      margin-bottom: 0;
+    }
+
+    .request-top {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 14px;
+    }
+
+    .request-user {
+      font-size: 13px;
+
+      font-weight: 800;
+
+      word-break: break-all;
+    }
+
     .request-line {
-      margin: 5px 0;
-      font-size: 14px;
+      margin: 8px 0;
+
+      font-size: 12px;
+
+      color: #475467;
+    }
+
+    .request-line strong {
+      color: #101828;
+    }
+
+    code {
+      background: #f1f5f9;
+
+      border-radius: 6px;
+
+      padding: 4px 7px;
+
+      font-size: 11px;
     }
 
     .status {
-      display: inline-block;
+      display: inline-flex;
+
       padding: 5px 9px;
+
       border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      text-transform: uppercase;
     }
 
     .pending {
-      background: #fff3cd;
-      color: #856404;
+      background: #fef3c7;
+      color: #92400e;
     }
 
     .approved {
-      background: #d1e7dd;
-      color: #0f5132;
+      background: #dcfce7;
+      color: #166534;
     }
 
     .rejected {
-      background: #f8d7da;
-      color: #842029;
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     .threat {
-      background: #f8d7da;
-      color: #842029;
+      background: #fee2e2;
+      color: #991b1b;
     }
 
-    .chat {
-      height: 500px;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      overflow: hidden;
+    .empty {
+      padding: 35px 20px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      border: 1px dashed #d0d5dd;
+
+      border-radius: 14px;
     }
 
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-      background: #f7f7f7;
+    .loading {
+      padding: 25px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 12px;
     }
 
-    .message {
-      background: white;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 8px;
-    }
+    @media (max-width: 700px) {
+      .topbar {
+        height: auto;
 
-    .message-meta {
-      font-size: 11px;
-      color: #888;
-      margin-bottom: 5px;
-    }
+        padding: 16px 18px;
 
-    .chat-send {
-      display: flex;
-      gap: 8px;
-      padding: 10px;
-      background: white;
-      border-top: 1px solid #ddd;
-    }
+        align-items: flex-start;
+      }
 
-    .chat-send input {
-      margin: 0;
-      flex: 1;
-    }
+      .topbar-right {
+        gap: 8px;
+      }
 
-    .chat-send button {
-      width: auto;
+      .admin-email {
+        display: none;
+      }
+
+      .dashboard {
+        padding: 25px 15px 50px;
+      }
+
+      .welcome h1 {
+        font-size: 24px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 17px;
+
+        border-radius: 16px;
+      }
+
+      .create-form {
+        flex-direction: column;
+
+        align-items: stretch;
+      }
+
+      .create-form input,
+      .create-form button {
+        width: 100%;
+      }
+
+      .group-top,
+      .request-top {
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .tab-btn {
+        flex: 1;
+      }
+
+      .login-box {
+        padding: 28px 22px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<!-- ==================================================
+     LOGIN
+================================================== -->
+
 <div id="loginPage" class="login-page">
 
   <div class="login-box">
 
-    <div class="logo">Chatbot</div>
+    <div class="brand">
 
-    <div class="subtitle">
-      Admin panelinə giriş
+      <div class="brand-icon">
+        C
+      </div>
+
+      <div>
+        <div class="brand-name">
+          Chatbot
+        </div>
+
+        <div class="brand-subtitle">
+          Təhlükəsiz qrup çat sistemi
+        </div>
+      </div>
+
     </div>
+
+
+    <h1 class="login-title">
+      Admin paneli
+    </h1>
+
+    <p class="login-description">
+      İdarəetmə panelinə daxil olmaq üçün admin hesabınızla
+      giriş edin.
+    </p>
+
 
     <form id="loginForm">
 
-      <input
-        id="email"
-        type="email"
-        placeholder="Admin email"
-        required
-      >
+      <div class="form-group">
 
-      <input
-        id="password"
-        type="password"
-        placeholder="Şifrə"
-        required
-      >
+        <label class="form-label">
+          Admin email
+        </label>
 
-      <button class="primary" type="submit">
+        <div class="input-wrap">
+
+          <span class="input-icon">
+            ✉
+          </span>
+
+          <input
+            id="email"
+            type="email"
+            placeholder="Admin email"
+            autocomplete="username"
+            required
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label class="form-label">
+          Şifrə
+        </label>
+
+        <div class="input-wrap">
+
+          <span class="input-icon">
+            🔒
+          </span>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Şifrənizi daxil edin"
+            autocomplete="current-password"
+            required
+          >
+
+          <button
+            type="button"
+            id="passwordToggle"
+            class="password-toggle"
+            aria-label="Şifrəni göstər">
+            ◉
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <button
+        id="loginButton"
+        class="login-button"
+        type="submit">
         Daxil ol
       </button>
 
     </form>
 
-    <div id="loginError" class="error hidden"></div>
+
+    <div
+      id="loginError"
+      class="error hidden">
+    </div>
+
+
+    <div class="login-footer">
+      Yalnız səlahiyyətli admin hesabı üçün
+    </div>
 
   </div>
 
 </div>
 
 
-<!-- ADMIN -->
+<!-- ==================================================
+     ADMIN PANEL
+================================================== -->
+
 <div id="adminPage" class="admin-page hidden">
 
-  <header>
+  <header class="topbar">
 
-    <div>
-      <h1>Chatbot Admin Panel</h1>
+    <div class="topbar-left">
 
-      <div id="adminEmail" class="admin-email"></div>
+      <div class="mini-logo">
+        C
+      </div>
+
+      <div>
+
+        <div class="topbar-title">
+          Chatbot Admin
+        </div>
+
+        <div class="topbar-subtitle">
+          Sistem idarəetmə paneli
+        </div>
+
+      </div>
+
     </div>
 
-    <button id="logoutBtn" class="logout">
-      Çıxış
-    </button>
+
+    <div class="topbar-right">
+
+      <div class="admin-account">
+
+        <div class="admin-avatar">
+          A
+        </div>
+
+        <div
+          id="adminEmail"
+          class="admin-email">
+        </div>
+
+      </div>
+
+
+      <button
+        id="logoutBtn"
+        class="logout">
+        Çıxış
+      </button>
+
+    </div>
 
   </header>
 
 
-  <div class="container">
+  <main class="dashboard">
+
+    <div class="welcome">
+
+      <h1>
+        Xoş gəldiniz, Admin
+      </h1>
+
+      <p>
+        Qrupları və istifadəçi qoşulma sorğularını buradan idarə edin.
+      </p>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="stat-icon">
+          👥
+        </div>
+
+        <div>
+
+          <div
+            id="groupCount"
+            class="stat-number">
+            0
+          </div>
+
+          <div class="stat-label">
+            Aktiv qrup
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-icon">
+          🔔
+        </div>
+
+        <div>
+
+          <div
+            id="pendingCount"
+            class="stat-number">
+            0
+          </div>
+
+          <div class="stat-label">
+            Gözləyən sorğu
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABS -->
 
     <div class="tabs">
 
@@ -370,40 +1336,59 @@
         Qruplar
       </button>
 
+
       <button
         class="tab-btn"
         data-tab="requestsTab">
         Qoşulma sorğuları
       </button>
 
-      <button
-        class="tab-btn"
-        data-tab="chatTab">
-        Admin çat
-      </button>
-
     </div>
 
 
-    <!-- GROUPS -->
+    <!-- ==================================================
+         GROUPS
+    ================================================== -->
 
-    <div id="groupsTab" class="tab-content">
+    <div
+      id="groupsTab"
+      class="tab-content">
 
       <div class="section">
 
-        <h2>Yeni qrup yarat</h2>
+        <div class="section-header">
 
-        <input
-          id="groupName"
-          type="text"
-          placeholder="Qrup adı"
-        >
+          <div>
 
-        <button
-          id="createGroupBtn"
-          class="primary">
-          Qrup yarat
-        </button>
+            <h2>
+              Yeni qrup yarat
+            </h2>
+
+            <div class="section-description">
+              Yeni qrup yaradın və sistem avtomatik giriş kodu versin.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="create-form">
+
+          <input
+            id="groupName"
+            type="text"
+            placeholder="Məsələn: 160 HTML qrupu"
+          >
+
+          <button
+            id="createGroupBtn"
+            class="primary">
+            + Qrup yarat
+          </button>
+
+        </div>
+
 
         <div id="groupCreateMessage"></div>
 
@@ -412,10 +1397,27 @@
 
       <div class="section">
 
-        <h2>Qruplarım</h2>
+        <div class="section-header">
+
+          <div>
+
+            <h2>
+              Qruplarım
+            </h2>
+
+            <div class="section-description">
+              Mövcud qrupları və giriş kodlarını idarə edin.
+            </div>
+
+          </div>
+
+        </div>
+
 
         <div id="groupsList">
-          Yüklənir...
+          <div class="loading">
+            Yüklənir...
+          </div>
         </div>
 
       </div>
@@ -423,67 +1425,44 @@
     </div>
 
 
-    <!-- REQUESTS -->
+    <!-- ==================================================
+         REQUESTS
+    ================================================== -->
 
-    <div id="requestsTab" class="tab-content hidden">
+    <div
+      id="requestsTab"
+      class="tab-content hidden">
 
       <div class="section">
 
-        <h2>Qoşulma sorğuları</h2>
+        <div class="section-header">
+
+          <div>
+
+            <h2>
+              Qoşulma sorğuları
+            </h2>
+
+            <div class="section-description">
+              İstifadəçilərin qrupa qoşulma cəhdlərini yoxlayın.
+            </div>
+
+          </div>
+
+        </div>
+
 
         <div id="requestsList">
-          Yüklənir...
+          <div class="loading">
+            Yüklənir...
+          </div>
         </div>
 
       </div>
 
     </div>
 
-
-    <!-- CHAT -->
-
-    <div id="chatTab" class="tab-content hidden">
-
-      <div class="section">
-
-        <h2>Admin çat</h2>
-
-        <select id="chatGroupSelect">
-          <option value="">Qrup seç</option>
-        </select>
-
-        <br><br>
-
-        <div class="chat">
-
-          <div
-            id="chatMessages"
-            class="messages">
-          </div>
-
-          <div class="chat-send">
-
-            <input
-              id="chatInput"
-              type="text"
-              placeholder="Mesaj yaz..."
-            >
-
-            <button
-              id="sendChatBtn"
-              class="primary">
-              Göndər
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
+  </main>
 
 </div>
 
@@ -496,7 +1475,8 @@ from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import {
   SUPABASE_URL,
   SUPABASE_ANON_KEY
-} from "./supabase-config.js";
+}
+from "./supabase-config.js";
 
 
 const supabase =
@@ -505,6 +1485,10 @@ const supabase =
     SUPABASE_ANON_KEY
   );
 
+
+/* ==================================================
+   ELEMENTS
+================================================== */
 
 const loginPage =
   document.getElementById("loginPage");
@@ -518,6 +1502,13 @@ const loginError =
 const adminEmail =
   document.getElementById("adminEmail");
 
+const loginButton =
+  document.getElementById("loginButton");
+
+
+/* ==================================================
+   LOGIN ERROR
+================================================== */
 
 function showLoginError(message) {
 
@@ -535,22 +1526,51 @@ function hideLoginError() {
 }
 
 
-/* =========================
+/* ==================================================
+   PASSWORD SHOW/HIDE
+================================================== */
+
+document
+  .getElementById("passwordToggle")
+  .addEventListener("click", () => {
+
+    const password =
+      document.getElementById("password");
+
+    if (password.type === "password") {
+
+      password.type = "text";
+
+    } else {
+
+      password.type = "password";
+
+    }
+
+  });
+
+
+/* ==================================================
    ADMIN CHECK
-========================= */
+================================================== */
 
 async function checkAdmin() {
 
   const {
-    data: { user }
+    data: {
+      user
+    }
   } = await supabase.auth.getUser();
+
 
   if (!user) {
 
     loginPage.classList.remove("hidden");
+
     adminPage.classList.add("hidden");
 
     return false;
+
   }
 
 
@@ -565,6 +1585,7 @@ async function checkAdmin() {
     await supabase.auth.signOut();
 
     loginPage.classList.remove("hidden");
+
     adminPage.classList.add("hidden");
 
     showLoginError(
@@ -572,388 +1593,201 @@ async function checkAdmin() {
     );
 
     return false;
+
   }
 
 
   adminEmail.textContent =
     user.email;
 
+
   loginPage.classList.add("hidden");
+
   adminPage.classList.remove("hidden");
 
   return true;
+
 }
 
 
-/* =========================
+/* ==================================================
    LOGIN
-========================= */
+================================================== */
 
 document
   .getElementById("loginForm")
-  .addEventListener("submit", async (e) => {
+  .addEventListener(
+    "submit",
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    hideLoginError();
+      hideLoginError();
 
-    const email =
-      document.getElementById("email").value.trim();
+      loginButton.disabled = true;
 
-    const password =
-      document.getElementById("password").value;
-
-
-    const {
-      error
-    } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+      loginButton.textContent =
+        "Yoxlanılır...";
 
 
-    if (error) {
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
 
-      showLoginError(
-        "Email və ya şifrə yanlışdır."
-      );
 
-      return;
+      const password =
+        document
+          .getElementById("password")
+          .value;
+
+
+      const {
+        error
+      } =
+        await supabase.auth.signInWithPassword({
+
+          email,
+          password
+
+        });
+
+
+      if (error) {
+
+        showLoginError(
+          "Email və ya şifrə yanlışdır."
+        );
+
+        loginButton.disabled = false;
+
+        loginButton.textContent =
+          "Daxil ol";
+
+        return;
+
+      }
+
+
+      const allowed =
+        await checkAdmin();
+
+
+      if (allowed) {
+
+        await loadGroups();
+
+        await loadRequests();
+
+      }
+
+
+      loginButton.disabled = false;
+
+      loginButton.textContent =
+        "Daxil ol";
+
     }
+  );
 
 
-    const allowed =
-      await checkAdmin();
-
-    if (allowed) {
-
-      await loadGroups();
-      await loadRequests();
-      await loadChatGroups();
-
-    }
-
-  });
-
-
-/* =========================
+/* ==================================================
    LOGOUT
-========================= */
+================================================== */
 
 document
   .getElementById("logoutBtn")
-  .addEventListener("click", async () => {
+  .addEventListener(
+    "click",
+    async () => {
 
-    await supabase.auth.signOut();
+      await supabase.auth.signOut();
 
-    location.reload();
+      location.reload();
 
-  });
+    }
+  );
 
 
-/* =========================
+/* ==================================================
    TABS
-========================= */
+================================================== */
 
 document
   .querySelectorAll(".tab-btn")
   .forEach(btn => {
 
-    btn.addEventListener("click", () => {
+    btn.addEventListener(
+      "click",
+      () => {
 
-      document
-        .querySelectorAll(".tab-btn")
-        .forEach(x =>
-          x.classList.remove("active")
-        );
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach(x => {
 
-      btn.classList.add("active");
+            x.classList.remove("active");
 
-
-      document
-        .querySelectorAll(".tab-content")
-        .forEach(x =>
-          x.classList.add("hidden")
-        );
+          });
 
 
-      document
-        .getElementById(btn.dataset.tab)
-        .classList.remove("hidden");
+        btn.classList.add("active");
 
-    });
+
+        document
+          .querySelectorAll(".tab-content")
+          .forEach(x => {
+
+            x.classList.add("hidden");
+
+          });
+
+
+        document
+          .getElementById(
+            btn.dataset.tab
+          )
+          .classList.remove("hidden");
+
+      }
+    );
 
   });
 
 
-/* =========================
+/* ==================================================
    GROUPS
-========================= */
+================================================== */
 
 async function loadGroups() {
 
   const container =
-    document.getElementById("groupsList");
-
-  container.innerHTML =
-    "Yüklənir...";
-
-
-  const {
-    data,
-    error
-  } = await supabase
-    .from("groups")
-    .select("*")
-    .order("created_at", {
-      ascending: false
-    });
-
-
-  if (error) {
-
-    container.innerHTML =
-      `<div class="error">
-        ${escapeHtml(error.message)}
-      </div>`;
-
-    return;
-  }
-
-
-  if (!data || data.length === 0) {
-
-    container.innerHTML =
-      "Hələ qrup yoxdur.";
-
-    return;
-  }
-
-
-  container.innerHTML = "";
-
-
-  data.forEach(group => {
-
-    const div =
-      document.createElement("div");
-
-    div.className = "group";
-
-    div.innerHTML = `
-
-      <div class="group-title">
-        ${escapeHtml(group.name)}
-      </div>
-
-      <div>
-        <span class="code">
-          Kod: ${escapeHtml(group.invite_code)}
-        </span>
-      </div>
-
-      <div class="actions">
-
-        <button
-          class="warning"
-          onclick="rotateCode('${group.id}')">
-          Kodu dəyiş
-        </button>
-
-        <button
-          class="danger"
-          onclick="deleteGroup('${group.id}')">
-          Qrupu sil
-        </button>
-
-      </div>
-    `;
-
-
-    container.appendChild(div);
-
-  });
-
-}
-
-
-/* =========================
-   CREATE GROUP
-========================= */
-
-document
-  .getElementById("createGroupBtn")
-  .addEventListener("click", async () => {
-
-    const name =
-      document.getElementById("groupName")
-        .value
-        .trim();
-
-
-    if (!name) {
-
-      alert("Qrup adını yaz.");
-
-      return;
-    }
-
-
-    const {
-      error
-    } = await supabase.rpc(
-      "create_chat_group",
-      {
-        group_name: name
-      }
+    document.getElementById(
+      "groupsList"
     );
 
 
-    if (error) {
-
-      document.getElementById(
-        "groupCreateMessage"
-      ).innerHTML = `
-        <div class="error">
-          ${escapeHtml(error.message)}
-        </div>
-      `;
-
-      return;
-    }
-
-
-    document.getElementById(
-      "groupName"
-    ).value = "";
-
-
-    document.getElementById(
-      "groupCreateMessage"
-    ).innerHTML = `
-      <div class="success-box">
-        Qrup yaradıldı.
+  container.innerHTML =
+    `
+      <div class="loading">
+        Qruplar yüklənir...
       </div>
     `;
-
-
-    await loadGroups();
-    await loadChatGroups();
-
-  });
-
-
-/* =========================
-   ROTATE CODE
-========================= */
-
-window.rotateCode =
-async function(groupId) {
-
-  if (
-    !confirm(
-      "Bu qrupun kodunu dəyişmək istəyirsiniz?"
-    )
-  ) {
-    return;
-  }
-
-
-  const {
-    error
-  } = await supabase.rpc(
-    "rotate_group_code",
-    {
-      target_group: groupId
-    }
-  );
-
-
-  if (error) {
-
-    alert(error.message);
-
-    return;
-  }
-
-
-  alert("Qrup kodu dəyişdirildi.");
-
-  await loadGroups();
-
-};
-
-
-/* =========================
-   DELETE GROUP
-========================= */
-
-window.deleteGroup =
-async function(groupId) {
-
-  if (
-    !confirm(
-      "Bu qrupu tamamilə silmək istəyirsiniz?"
-    )
-  ) {
-    return;
-  }
-
-
-  const {
-    error
-  } = await supabase.rpc(
-    "delete_chat_group",
-    {
-      target_group: groupId
-    }
-  );
-
-
-  if (error) {
-
-    alert(error.message);
-
-    return;
-  }
-
-
-  await loadGroups();
-  await loadRequests();
-  await loadChatGroups();
-
-};
-
-
-/* =========================
-   JOIN REQUESTS
-========================= */
-
-async function loadRequests() {
-
-  const container =
-    document.getElementById("requestsList");
-
-  container.innerHTML =
-    "Yüklənir...";
 
 
   const {
     data,
     error
-  } = await supabase
-    .from("join_requests")
-    .select(`
-      id,
-      user_id,
-      group_id,
-      attempted_code,
-      status,
-      created_at
-    `)
-    .order("created_at", {
-      ascending: false
-    });
+  } =
+    await supabase
+      .from("groups")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
@@ -965,47 +1799,424 @@ async function loadRequests() {
     `;
 
     return;
+
   }
+
+
+  document.getElementById(
+    "groupCount"
+  ).textContent =
+    data ? data.length : 0;
 
 
   if (!data || data.length === 0) {
 
-    container.innerHTML =
-      "Heç bir qoşulma sorğusu yoxdur.";
+    container.innerHTML = `
+      <div class="empty">
+        Hələ heç bir qrup yaradılmayıb.
+      </div>
+    `;
 
     return;
+
   }
 
 
   container.innerHTML = "";
 
 
-  for (const request of data) {
+  data.forEach(group => {
 
     const div =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
-    div.className = "request";
+    div.className =
+      "group";
+
+
+    div.innerHTML = `
+
+      <div class="group-top">
+
+        <div>
+
+          <div class="group-title">
+            ${escapeHtml(group.name)}
+          </div>
+
+          <div class="group-id">
+            Qrup ID: ${escapeHtml(group.id)}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="code">
+        🔑
+        Kod:
+        <strong>
+          ${escapeHtml(group.invite_code)}
+        </strong>
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="warning"
+          onclick="rotateCode('${group.id}')">
+          🔄 Kodu dəyiş
+        </button>
+
+
+        <button
+          class="danger"
+          onclick="deleteGroup('${group.id}')">
+          🗑️ Qrupu sil
+        </button>
+
+      </div>
+
+    `;
+
+
+    container.appendChild(div);
+
+  });
+
+}
+
+
+/* ==================================================
+   CREATE GROUP
+================================================== */
+
+document
+  .getElementById("createGroupBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      const name =
+        document
+          .getElementById("groupName")
+          .value
+          .trim();
+
+
+      if (!name) {
+
+        alert(
+          "Qrup adını yaz."
+        );
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "createGroupBtn"
+        );
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "Yaradılır...";
+
+
+      const {
+        error
+      } =
+        await supabase.rpc(
+          "create_chat_group",
+          {
+            group_name:
+              name
+          }
+        );
+
+
+      button.disabled = false;
+
+      button.textContent =
+        "+ Qrup yarat";
+
+
+      if (error) {
+
+        document.getElementById(
+          "groupCreateMessage"
+        ).innerHTML = `
+
+          <div class="error">
+            ${escapeHtml(
+              error.message
+            )}
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "groupName"
+      ).value = "";
+
+
+      document.getElementById(
+        "groupCreateMessage"
+      ).innerHTML = `
+
+        <div class="success-box">
+          ✓ Qrup uğurla yaradıldı.
+        </div>
+
+      `;
+
+
+      await loadGroups();
+
+    }
+  );
+
+
+/* ==================================================
+   ROTATE GROUP CODE
+================================================== */
+
+window.rotateCode =
+async function(groupId) {
+
+  if (
+    !confirm(
+      "Bu qrupun kodunu dəyişmək istəyirsiniz?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabase.rpc(
+      "rotate_group_code",
+      {
+        target_group:
+          groupId
+      }
+    );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "Qrup kodu dəyişdirildi."
+  );
+
+
+  await loadGroups();
+
+};
+
+
+/* ==================================================
+   DELETE GROUP
+================================================== */
+
+window.deleteGroup =
+async function(groupId) {
+
+  if (
+    !confirm(
+      "Bu qrupu tamamilə silmək istəyirsiniz?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabase.rpc(
+      "delete_chat_group",
+      {
+        target_group:
+          groupId
+      }
+    );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadGroups();
+
+  await loadRequests();
+
+};
+
+
+/* ==================================================
+   JOIN REQUESTS
+================================================== */
+
+async function loadRequests() {
+
+  const container =
+    document.getElementById(
+      "requestsList"
+    );
+
+
+  container.innerHTML = `
+    <div class="loading">
+      Sorğular yüklənir...
+    </div>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from("join_requests")
+      .select(`
+        id,
+        user_id,
+        group_id,
+        attempted_code,
+        status,
+        created_at
+      `)
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    container.innerHTML = `
+      <div class="error">
+        ${escapeHtml(
+          error.message
+        )}
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const pending =
+    (data || [])
+      .filter(
+        x =>
+          x.status === "pending"
+      )
+      .length;
+
+
+  document.getElementById(
+    "pendingCount"
+  ).textContent =
+    pending;
+
+
+  if (!data || data.length === 0) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Heç bir qoşulma sorğusu yoxdur.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  for (
+    const request
+    of data
+  ) {
+
+    const div =
+      document.createElement(
+        "div"
+      );
+
+
+    div.className =
+      "request";
 
 
     let groupName =
       "Naməlum qrup";
 
 
-    if (request.group_id) {
+    if (
+      request.group_id
+    ) {
 
       const {
         data: group
-      } = await supabase
-        .from("groups")
-        .select("name")
-        .eq("id", request.group_id)
-        .maybeSingle();
+      } =
+        await supabase
+          .from("groups")
+          .select("name")
+          .eq(
+            "id",
+            request.group_id
+          )
+          .maybeSingle();
 
 
       if (group) {
+
         groupName =
           group.name;
+
       }
 
     }
@@ -1013,105 +2224,151 @@ async function loadRequests() {
 
     div.innerHTML = `
 
-      <div class="request-line">
-        <strong>İstifadəçi:</strong>
-        ${escapeHtml(request.user_id)}
+      <div class="request-top">
+
+        <div class="request-user">
+
+          👤
+          ${escapeHtml(
+            request.user_id
+          )}
+
+        </div>
+
+
+        <span class="status ${escapeHtml(request.status)}">
+          ${escapeHtml(
+            request.status
+          )}
+        </span>
+
       </div>
 
-      <div class="request-line">
-        <strong>Qrup:</strong>
-        ${escapeHtml(groupName)}
-      </div>
 
       <div class="request-line">
-        <strong>Daxil edilən kod:</strong>
+
+        <strong>
+          Qrup:
+        </strong>
+
+        ${escapeHtml(
+          groupName
+        )}
+
+      </div>
+
+
+      <div class="request-line">
+
+        <strong>
+          Daxil edilən kod:
+        </strong>
+
         <code>
-          ${escapeHtml(request.attempted_code || "-")}
+          ${escapeHtml(
+            request.attempted_code ||
+            "-"
+          )}
         </code>
+
       </div>
 
+
       <div class="request-line">
-        <strong>Tarix:</strong>
+
+        <strong>
+          Tarix:
+        </strong>
+
         ${escapeHtml(
           new Date(
             request.created_at
-          ).toLocaleString("az-AZ")
+          ).toLocaleString(
+            "az-AZ"
+          )
         )}
-      </div>
 
-      <div class="request-line">
-        <strong>Status:</strong>
-        <span class="status ${request.status}">
-          ${escapeHtml(request.status)}
-        </span>
       </div>
 
 
       ${
         request.status === "pending"
         ?
+
         `
-        <div class="actions">
 
-          <button
-            class="success"
-            onclick="reviewRequest(
-              '${request.id}',
-              'approved',
-              '${request.group_id || ""}'
-            )">
-            Təsdiqlə
-          </button>
+          <div class="actions">
 
-
-          <button
-            class="secondary"
-            onclick="reviewRequest(
-              '${request.id}',
-              'rejected',
-              '${request.group_id || ""}'
-            )">
-            Rədd et
-          </button>
-
-
-          ${
-            request.group_id
-            ?
-            `
             <button
-              class="danger"
+              class="success"
               onclick="reviewRequest(
                 '${request.id}',
-                'threat',
-                '${request.group_id}'
+                'approved',
+                '${request.group_id || ""}'
               )">
-              Təhlükə
+              ✓ Təsdiqlə
             </button>
-            `
-            :
-            ""
-          }
 
-        </div>
+
+            <button
+              class="secondary"
+              onclick="reviewRequest(
+                '${request.id}',
+                'rejected',
+                '${request.group_id || ""}'
+              )">
+              ✕ Rədd et
+            </button>
+
+
+            ${
+              request.group_id
+              ?
+
+              `
+
+                <button
+                  class="danger"
+                  onclick="reviewRequest(
+                    '${request.id}',
+                    'threat',
+                    '${request.group_id}'
+                  )">
+                  ⚠ Təhlükə
+                </button>
+
+              `
+
+              :
+
+              ""
+            }
+
+          </div>
+
         `
+
         :
+
         ""
+
       }
 
     `;
 
 
-    container.appendChild(div);
+    container.appendChild(
+      div
+    );
 
   }
 
 }
 
 
-/* =========================
+/* ==================================================
    REVIEW REQUEST
-========================= */
+================================================== */
 
 window.reviewRequest =
 async function(
@@ -1124,47 +2381,67 @@ async function(
     "Sorğunu təsdiqləmək istəyirsiniz?";
 
 
-  if (decision === "rejected") {
+  if (
+    decision === "rejected"
+  ) {
 
     message =
       "Sorğunu rədd etmək istəyirsiniz?";
+
   }
 
 
-  if (decision === "threat") {
+  if (
+    decision === "threat"
+  ) {
 
     message =
       "Bu sorğunu təhlükə kimi işarələmək və qrup kodunu dəyişmək istəyirsiniz?";
+
   }
 
 
-  if (!confirm(message)) {
+  if (
+    !confirm(
+      message
+    )
+  ) {
 
     return;
+
   }
 
 
   const {
     error
-  } = await supabase.rpc(
-    "review_join_request",
-    {
-      target_request:
-        requestId,
+  } =
+    await supabase.rpc(
+      "review_join_request",
+      {
+        target_request:
+          requestId,
 
-      decision:
-        decision
-    }
-  );
+        decision:
+          decision
+      }
+    );
 
 
   if (error) {
 
-    alert(error.message);
+    alert(
+      error.message
+    );
 
     return;
+
   }
 
+
+  /*
+   * Təhlükədirsə,
+   * qrup kodunu da dəyişirik.
+   */
 
   if (
     decision === "threat" &&
@@ -1172,282 +2449,49 @@ async function(
   ) {
 
     const {
-      error: rotateError
-    } = await supabase.rpc(
-      "rotate_group_code",
-      {
-        target_group:
-          groupId
-      }
-    );
+      error:
+        rotateError
+    } =
+      await supabase.rpc(
+        "rotate_group_code",
+        {
+          target_group:
+            groupId
+        }
+      );
 
 
     if (rotateError) {
 
       alert(
-        "Sorğu təhlükə kimi işarələndi, amma kod dəyişdirilə bilmədi: " +
+        "Sorğu təhlükə kimi işarələndi, amma qrup kodu dəyişdirilə bilmədi: " +
         rotateError.message
       );
 
       await loadRequests();
 
       return;
+
     }
 
   }
 
 
   await loadRequests();
+
   await loadGroups();
 
 };
 
 
-/* =========================
-   ADMIN CHAT
-========================= */
-
-async function loadChatGroups() {
-
-  const select =
-    document.getElementById(
-      "chatGroupSelect"
-    );
-
-
-  select.innerHTML =
-    `<option value="">
-      Qrup seç
-    </option>`;
-
-
-  const {
-    data,
-    error
-  } = await supabase
-    .from("groups")
-    .select("id,name")
-    .order("created_at", {
-      ascending: false
-    });
-
-
-  if (error) {
-
-    return;
-  }
-
-
-  data.forEach(group => {
-
-    const option =
-      document.createElement("option");
-
-    option.value =
-      group.id;
-
-    option.textContent =
-      group.name;
-
-    select.appendChild(option);
-
-  });
-
-}
-
-
-document
-  .getElementById("chatGroupSelect")
-  .addEventListener(
-    "change",
-    async function() {
-
-      await loadChatMessages(
-        this.value
-      );
-
-    }
-  );
-
-
-async function loadChatMessages(
-  groupId
-) {
-
-  const container =
-    document.getElementById(
-      "chatMessages"
-    );
-
-
-  container.innerHTML =
-    "";
-
-
-  if (!groupId) {
-
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("created_at", {
-      ascending: true
-    });
-
-
-  if (error) {
-
-    container.innerHTML = `
-      <div class="error">
-        ${escapeHtml(error.message)}
-      </div>
-    `;
-
-    return;
-  }
-
-
-  data.forEach(message => {
-
-    addMessageToChat(
-      message
-    );
-
-  });
-
-
-  container.scrollTop =
-    container.scrollHeight;
-
-}
-
-
-function addMessageToChat(
-  message
-) {
-
-  const container =
-    document.getElementById(
-      "chatMessages"
-    );
-
-
-  const div =
-    document.createElement("div");
-
-  div.className =
-    "message";
-
-
-  div.innerHTML = `
-
-    <div class="message-meta">
-      ${escapeHtml(
-        message.sender_id || ""
-      )}
-
-      ·
-
-      ${escapeHtml(
-        new Date(
-          message.created_at
-        ).toLocaleString(
-          "az-AZ"
-        )
-      )}
-    </div>
-
-    <div>
-      ${escapeHtml(
-        message.content || ""
-      )}
-    </div>
-
-  `;
-
-
-  container.appendChild(div);
-
-}
-
-
-document
-  .getElementById("sendChatBtn")
-  .addEventListener(
-    "click",
-    async () => {
-
-      const groupId =
-        document.getElementById(
-          "chatGroupSelect"
-        ).value;
-
-
-      const input =
-        document.getElementById(
-          "chatInput"
-        );
-
-
-      const content =
-        input.value.trim();
-
-
-      if (!groupId || !content) {
-
-        return;
-      }
-
-
-      const {
-        error
-      } = await supabase
-        .from("messages")
-        .insert({
-          group_id:
-            groupId,
-
-          sender_id:
-            (
-              await supabase.auth.getUser()
-            ).data.user.id,
-
-          content:
-            content
-        });
-
-
-      if (error) {
-
-        alert(error.message);
-
-        return;
-      }
-
-
-      input.value = "";
-
-      await loadChatMessages(
-        groupId
-      );
-
-    }
-  );
-
-
-/* =========================
-   REALTIME REQUESTS
-========================= */
+/* ==================================================
+   REALTIME JOIN REQUESTS
+================================================== */
 
 supabase
-  .channel("admin-join-requests")
+  .channel(
+    "admin-join-requests"
+  )
   .on(
     "postgres_changes",
     {
@@ -1472,55 +2516,9 @@ supabase
   .subscribe();
 
 
-/* =========================
-   REALTIME CHAT
-========================= */
-
-supabase
-  .channel("admin-messages")
-  .on(
-    "postgres_changes",
-    {
-      event: "INSERT",
-      schema: "public",
-      table: "messages"
-    },
-    payload => {
-
-      const selectedGroup =
-        document.getElementById(
-          "chatGroupSelect"
-        ).value;
-
-
-      if (
-        selectedGroup &&
-        payload.new.group_id ===
-        selectedGroup
-      ) {
-
-        addMessageToChat(
-          payload.new
-        );
-
-        const container =
-          document.getElementById(
-            "chatMessages"
-          );
-
-        container.scrollTop =
-          container.scrollHeight;
-
-      }
-
-    }
-  )
-  .subscribe();
-
-
-/* =========================
+/* ==================================================
    ESCAPE HTML
-========================= */
+================================================== */
 
 function escapeHtml(
   value
@@ -1537,18 +2535,33 @@ function escapeHtml(
 
 
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
 
-/* =========================
+/* ==================================================
    START
-========================= */
+================================================== */
 
 (async () => {
 
@@ -1559,8 +2572,8 @@ function escapeHtml(
   if (allowed) {
 
     await loadGroups();
+
     await loadRequests();
-    await loadChatGroups();
 
   }
 
