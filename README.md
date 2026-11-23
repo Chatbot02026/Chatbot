@@ -1,35 +1,30 @@
-# Chatbot
+# Chatbot — Supabase, GitHub və Vercel
 
-Responsive Azerbaijani group chat/admin panel built with React, Vite and Supabase. The repository can be connected to GitHub and deployed on Vercel.
+Bu qovluq statik sayt kimi yayımlanır. `index.html` istifadəçi çatıdır, `admin.html` qrup sahibinin idarəetmə panelidir. Əlavə Python serverinə (`main.py`) ehtiyac yoxdur: giriş, məlumat bazası, real vaxt və fayl saxlanması Supabase tərəfindən təmin edilir.
 
-## Supabase setup
+## 1. Supabase bağlantısı
 
-1. Create a Supabase project.
-2. Open **SQL Editor**, paste and run `supabase/schema.sql` once.
-3. In **Project Settings → API**, copy Project URL and the public anon/publishable key. Never put a `service_role` key in this browser app.
-4. In **Authentication → URL Configuration**, add the deployed Vercel URL to Site URL and Redirect URLs.
+1. Supabase-də yeni layihə yarat.
+2. Supabase **SQL Editor**-də `supabase/schema.sql` faylının məzmununu bir dəfə işə sal.
+3. **Project Settings → API** bölməsindən Project URL və public anon/publishable açarını götür. `service_role` açarını HTML-ə və ya brauzer koduna yazma.
+4. `config.js` faylında `YOUR_PROJECT` və `YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY` yerlərini öz URL və public açarınla əvəz et.
+5. **Authentication → URL Configuration** bölməsində Vercel saytının URL-ini Site URL və Redirect URLs siyahısına əlavə et.
 
-The schema creates groups, membership, chat messages and private PDF storage with Row Level Security. Group owners can change invitation codes and manage PDFs. Other authenticated users can join by code.
+SQL sxemi hesablar, qruplar, üzvlük, real vaxt mesajları və private PDF bucket yaradır. RLS qaydaları ilə yalnız üzvlər yazışmaları oxuyur; qrup sahibi dəvət kodlarını və PDF-ləri idarə edir.
 
-## Local setup
+## 2. GitHub
 
-```sh
-npm install
-```
+Faylları repository-nin əsas qovluğuna yerləşdir: `index.html`, `admin.html`, `styles.css`, `app.js`, `admin.js`, `supabase.js`, `config.js` və `supabase/schema.sql`. HTML və JS faylları eyni səviyyədə qalmalıdır.
 
-Copy `.env.example` to `.env.local` and enter your project details:
+Public anon açarı brauzer üçün nəzərdə tutulub və gizli deyil; təhlükəsizlik RLS qaydaları ilə təmin edilir. `service_role` secret açarını heç vaxt repository-yə yükləmə.
 
-```env
-VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY
-```
+## 3. Vercel
 
-Run `npm run dev`.
+1. Vercel-də GitHub repository-ni **Import** et.
+2. **Framework Preset: Other** seç. Build command boş qalsın; HTML/CSS/JS statik saytı üçün build addımı lazım deyil. Vercel faylları repository-nin əsas qovluğundan yayımlayır.
+3. Deploy et. Ana səhifə `/`, admin səhifəsi `/admin.html` ünvanında olacaq.
+4. GitHub-a yeni commit gələndə Vercel avtomatik yenidən deploy edir.
 
-## GitHub and Vercel
+## Təhlükəsizlik qeydi
 
-Push this folder to a GitHub repository and import it in Vercel. Use the Vite preset, build command `npm run build`, and output directory `dist`. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under Vercel Project Settings → Environment Variables, then redeploy.
-
-## Scope
-
-Email/password accounts, group creation and invite-code joining, owner code rotation and group deletion, Supabase Realtime group messages, and private PDF upload/deletion are connected. Messages travel over TLS and are access controlled, but end-to-end encryption is not implemented. Email confirmation behavior is controlled in Supabase Auth.
+Mesajlar TLS bağlantısı və Supabase giriş qaydaları ilə qorunur; ucdan-uca şifrələmə yoxdur. PDF yükləmə limiti 10 MB-dır.
