@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
 
-app = FastAPI(title="Chatbot", version="1.1.0")
+app = FastAPI(title="Chatbot", version="1.2.0")
 ROOT = Path(__file__).resolve().parent
 
 HTML = "text/html; charset=utf-8"
@@ -23,6 +23,13 @@ STATIC_FILES: dict[str, tuple[str, str]] = {
     "icon-512.png": (PNG, "public, max-age=86400"),
 }
 
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": "frame-ancestors 'none'",
+    "Referrer-Policy": "same-origin",
+}
+
 
 def serve(filename: str) -> FileResponse:
     entry = STATIC_FILES.get(filename)
@@ -33,7 +40,7 @@ def serve(filename: str) -> FileResponse:
     return FileResponse(
         path,
         media_type=media_type,
-        headers={"Cache-Control": cache_control, "X-Content-Type-Options": "nosniff"},
+        headers={"Cache-Control": cache_control, **SECURITY_HEADERS},
     )
 
 
