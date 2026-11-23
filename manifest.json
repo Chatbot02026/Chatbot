@@ -1,0 +1,21 @@
+{
+  "name": "Chatbot — Qrup Çatı",
+  "short_name": "Chatbot",
+  "description": "Təhlükəsiz qrup çatı və admin paneli",
+  "lang": "az",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#17372d",
+  "background_color": "#f4f2ec",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Admin Paneli", "url": "/admin.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
