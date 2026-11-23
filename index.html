@@ -11,280 +11,172 @@
 <title>Chatbot — Giriş</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
-:root{font-family:'DM Sans',sans-serif;color:#1a2c23;background:#f4f2ec;--green:#17372d;--gold:#f3bd57;--line:#e7e5dd;--muted:#77827a;--shadow:0 18px 55px rgba(26,52,35,.10)}
+:root{--green:#17372d;--gold:#f3bd57;--line:#e7e5dd;--muted:#77827a;--soft:#eaf2e7;--paper:#fffefa}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;min-height:100%}
-body{min-width:320px;background:radial-gradient(circle at top left,rgba(243,189,87,.13),transparent 30%),radial-gradient(circle at bottom right,rgba(23,55,45,.08),transparent 32%),#f4f2ec}
+html,body{margin:0}
+body{min-height:100vh;font-family:'DM Sans',sans-serif;color:#1a2c23;background:#fbf8f1;display:flex;justify-content:center;padding:22px 14px}
 button,input,select{font:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
-
-/* LOGIN */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
-.login-shell{width:min(100%,1050px);min-height:620px;display:grid;grid-template-columns:1fr 1fr;background:rgba(255,254,250,.94);border:1px solid #e6e2d9;border-radius:28px;overflow:hidden;box-shadow:0 25px 80px rgba(26,52,35,.13)}
-.login-brand{position:relative;padding:52px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(circle at 20% 20%,rgba(243,189,87,.18),transparent 30%),linear-gradient(145deg,#1a3b30,#10291f)}
-.login-brand::after{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(243,189,87,.16);border-radius:50%;right:-100px;bottom:-100px}
-.brand-top{position:relative;z-index:1;display:flex;align-items:center;gap:12px}
-.brand-icon{width:52px;height:52px;border:2px solid var(--gold);border-radius:17px 17px 23px 23px;color:var(--gold);display:grid;place-items:center;font-size:28px}
-.brand-name b{display:block;font:800 25px Manrope}
-.brand-name small{color:#cbd8d0;font-size:10px}
-.brand-content{position:relative;z-index:1;max-width:400px}
-.brand-content .eyebrow{color:#d5e0d9;font-size:10px;letter-spacing:1.5px;font-weight:800}
-.brand-content h1{font:800 43px/1.08 Manrope;letter-spacing:-1.5px;margin:17px 0 15px}
-.brand-content p{color:#d1ddd6;font-size:13px;line-height:1.8;margin:0}
-.security{position:relative;z-index:1;display:flex;align-items:center;gap:10px;color:#d6e2db;font-size:10px}
-.security-icon{width:32px;height:32px;border:1px solid rgba(255,255,255,.18);border-radius:10px;display:grid;place-items:center}
-.login-form-area{padding:52px 48px;display:flex;align-items:center;justify-content:center}
-.login-box{width:100%;max-width:390px}
-.login-box .eyebrow{color:#718077;font-size:9px;letter-spacing:1.4px;font-weight:800}
-.login-box h2{font:800 29px Manrope;letter-spacing:-.9px;margin:9px 0 7px}
-.login-box>p{color:var(--muted);font-size:11px;line-height:1.7;margin:0 0 24px}
-.login-form{display:grid;gap:14px}
-.field{display:grid;gap:7px}
-.field label{font-size:10px;font-weight:800;color:#36473d}
-.field input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:10px;outline:none;background:#fffefa;font-size:12px;color:#1a2c23;transition:.15s}
-.field input:focus{border-color:#8ba993;box-shadow:0 0 0 3px rgba(139,169,147,.10)}
-.password-wrap{position:relative}
-.password-wrap input{padding-right:55px}
-.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#718077;font-size:10px;font-weight:700;padding:7px}
-.pw-rules{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:3px;font-size:10px;color:var(--muted)}
-.pw-rules li::before{content:"✕ ";color:#b42318}
-.pw-rules li.ok{color:#258148}
-.pw-rules li.ok::before{content:"✓ ";color:#258148}
-.login-button{width:100%;margin-top:5px;border:0;border-radius:10px;padding:13px 15px;background:var(--green);color:#fff;font-size:11px;font-weight:800;transition:.15s}
-.login-button:hover{background:#20503f;transform:translateY(-1px)}
-.login-button:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.register-row{display:flex;justify-content:center;align-items:center;gap:5px;margin-top:17px;color:var(--muted);font-size:10px}
-.register-button{border:0;background:transparent;color:#27633e;font-size:10px;font-weight:800;padding:4px}
-.login-note{margin-top:25px;padding:10px 12px;background:#eef3ec;border-radius:9px;color:#54705b;font-size:9px;line-height:1.6;text-align:center}
-
-/* APP */
-#app{min-height:100vh}
-.layout{max-width:1440px;min-height:100vh;padding:18px;margin:auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px}
-.side{background:linear-gradient(155deg,#1a3b30,#112b22);color:#fff;border-radius:19px;padding:20px 15px;min-height:calc(100vh - 36px);display:flex;flex-direction:column;box-shadow:var(--shadow)}
-.brand{display:flex;align-items:center;gap:11px;padding:3px 4px 29px;color:#fff;text-decoration:none}
-.side .brand-icon{width:45px;height:45px;border-radius:15px 15px 20px 20px;font-size:26px}
-.brand b{font:800 21px Manrope;display:block}
-.brand small{color:#d0ddd4;font-size:10px}
-.nav{display:grid;gap:7px}
-.nav a{padding:12px;border-radius:11px;text-decoration:none;color:#e1e9e3;font-weight:600;font-size:13px}
-.nav a.active,.nav a:hover{background:var(--gold);color:#1a271e}
-.side-note{margin-top:auto;padding:14px 11px;border:1px solid #ffffff35;border-radius:12px;color:#dce7df;font-size:11px;line-height:1.6}
-.side-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:#aebdb4;font-size:10px}
-.side-bottom button{border:0;background:transparent;color:#fff;font-size:11px}
-.panel{background:#fdfbf7;border:1px solid #e8e5de;border-radius:19px;box-shadow:var(--shadow);overflow:hidden;min-height:calc(100vh - 36px)}
-.chat{display:flex;flex-direction:column}
-.top{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:105px}
-.top h1{font:800 23px Manrope;letter-spacing:-.7px;margin:4px 0}
-.top p{font-size:11px;color:var(--muted);margin:0}
-.eyebrow{font-size:9px;letter-spacing:1.1px;font-weight:800;color:#718077}
-.button{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:9px;padding:10px 14px;background:var(--gold);color:#1a271e;font-size:11px;font-weight:700}
-.button:disabled{opacity:.6}
-.avatar{height:34px;width:34px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
-.chat-app{display:flex;flex:1;min-height:0;flex-direction:column}
-.room-head{display:flex;align-items:center;gap:12px;padding:14px 19px;border-bottom:1px solid var(--line)}
-.people{width:51px;height:51px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:23px;flex:none}
-.room-title{flex:1;min-width:0}
-.room-title h2{font:800 17px Manrope;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.room-title p{font-size:10px;color:var(--muted);margin:0}
-.verified{color:#258148;font-weight:800}
-.picker{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line)}
-.picker label{font-size:10px;font-weight:700}
-.picker select{flex:1;min-width:0;max-width:55%;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:11px}
-.join{display:flex;gap:5px;margin-left:auto}
-.join input{width:145px;max-width:35vw;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:10px;outline:0}
-.join .button{padding:8px 10px}
-.code-line{margin:11px 16px 0;padding:9px;border-radius:9px;background:#eaf2e7;color:#526f59;text-align:center;font-size:10px}
-.code-line b{color:#183b2c;margin:0 7px;letter-spacing:.3px}
-.copy{border:1px solid #dce6da;border-radius:6px;padding:4px 7px;background:#fff;color:#34483a;font-size:9px}
-.messages{flex:1;min-height:250px;max-height:calc(100vh - 340px);overflow:auto;padding:17px 20px;display:flex;flex-direction:column;gap:14px}
-.message{display:flex;gap:9px;align-items:flex-start;max-width:86%}
+.bg{position:fixed;width:min(46vw,420px);pointer-events:none;z-index:0}
+.bg.tl{top:0;left:0}
+.bg.br{bottom:0;right:0;transform:rotate(180deg)}
+.card{position:relative;z-index:1;width:100%;max-width:480px;margin:auto;background:var(--paper);border-radius:26px;box-shadow:0 18px 55px rgba(26,52,35,.14);overflow:hidden}
+.head{position:relative;background:var(--green);color:#fff;padding:26px 24px 56px;display:flex;align-items:center;gap:14px}
+.head svg.logo{width:58px;height:58px;flex:none}
+.head b{display:block;font:800 26px Manrope}
+.head small{font-size:12px;color:#d5e0d9}
+.head .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.wave{position:absolute;left:0;bottom:-1px;width:100%;height:42px}
+.avatar{width:42px;height:42px;border:2px solid #cbd8d0;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none}
+.linkbtn{border:0;background:transparent;color:#d5e0d9;font-size:12px}
+.tabs{display:flex;background:#ece9e0;border-radius:999px;margin:6px 24px 0;overflow:hidden}
+.tabs button{flex:1;border:0;background:transparent;padding:13px;font-weight:700;font-size:13px;color:#34483a;border-radius:999px}
+.tabs button.active{background:var(--green);color:#fff}
+.pad{padding:18px 26px 26px}
+h2{font:800 32px Manrope;letter-spacing:-.8px;margin:6px 0 6px;text-align:center}
+.desc{text-align:center;font-size:14px;margin:0 0 20px}
+.form{display:grid;gap:12px}
+.inp{position:relative}
+.inp i{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-style:normal;font-size:15px}
+.inp input{width:100%;padding:15px 64px 15px 48px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:14px;outline:0}
+.inp input:focus{border-color:#8ba993;box-shadow:0 0 0 3px rgba(139,169,147,.12)}
+.password-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#718077;font-size:11px;font-weight:700}
+.pw-rules{list-style:none;margin:0;padding:12px 14px;background:var(--soft);border-radius:14px;display:grid;grid-template-rows:repeat(3,auto);grid-auto-flow:column;gap:6px 10px;font-size:13px}
+.pw-rules li{display:flex;align-items:center;gap:8px;color:#4b5b51}
+.pw-rules li::before{content:"✓";width:18px;height:18px;border-radius:50%;background:#c4cfc7;color:#fff;font-size:11px;display:grid;place-items:center;flex:none}
+.pw-rules li.ok::before{background:#34a55a}
+.btn{width:100%;border:0;border-radius:999px;padding:15px;background:var(--green);color:#fff;font-size:15px;font-weight:800}
+.btn:hover{background:#20503f}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn.soft{background:#ece9e0;color:var(--green)}
+.reg{display:flex;justify-content:center;gap:6px;margin-top:14px;font-size:14px}
+.reg button{border:0;background:transparent;color:#d9a02b;font-weight:800;padding:0}
+.success{text-align:center;padding-top:10px}
+.check{width:120px;height:120px;border-radius:50%;margin:6px auto 14px;background:#e3efdc;border:10px solid #f0f5ea;display:grid;place-items:center;font-size:56px;color:var(--green)}
+.success h2{font-size:30px}
+.success h3{font:800 18px Manrope;margin:0 0 14px}
+.success p{margin:0 0 20px;font-size:14px;line-height:1.6}
+.sub{padding:16px 24px 4px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sub h1{font:800 21px Manrope;margin:0}
+.sub p{margin:3px 0 0;font-size:13px}
+.ok{color:#2f9e55;font-weight:600;font-size:13px;white-space:nowrap}
+.ok::before{content:"● "}
+.row{display:flex;gap:10px;padding:8px 24px 0}
+.pill{display:flex;align-items:center;flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:0 8px 0 16px;background:var(--paper)}
+.pill label{font-size:14px}
+.pill select,.pill input{flex:1;min-width:0;border:0;background:transparent;padding:13px 8px;font-size:15px;outline:0}
+.pill input{padding-left:0}
+.join .btn{width:auto;padding:0 26px;font-size:14px}
+.code-line{margin:10px 24px 0;padding:11px;border-radius:999px;background:var(--soft);text-align:center;font-size:13px}
+.code-line b{margin:0 6px;letter-spacing:.4px}
+.copy{border:1px solid #dce6da;border-radius:999px;padding:5px 12px;background:#fff;color:#34483a;font-size:12px}
+.messages{min-height:240px;max-height:46vh;overflow:auto;padding:12px 24px;display:flex;flex-direction:column;gap:12px}
+.empty{margin:auto;padding:25px;text-align:center;color:#34483a;font-size:15px;line-height:1.5}
+.empty::before{content:"💬";display:block;font-size:46px;filter:grayscale(1) opacity(.45);margin-bottom:8px}
+.message{display:flex;gap:9px;align-items:flex-start;max-width:88%}
 .message.mine{align-self:flex-end;flex-direction:row-reverse}
+.message .avatar{width:32px;height:32px;border-color:transparent;background:var(--green);color:#fff;font-size:12px}
 .bubble-wrap{min-width:70px}
-.sender{font-size:10px;font-weight:700;margin:0 0 5px 4px}
+.sender{font-size:10px;font-weight:700;margin:0 0 4px 4px}
 .message.mine .sender{text-align:right}
-.bubble{background:#f0efeb;border-radius:5px 14px 14px;padding:10px 12px;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.bubble{background:#f0efeb;border-radius:5px 14px 14px;padding:10px 12px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
 .message.mine .bubble{background:#fff0d8;border-radius:14px 5px 14px 14px}
 .msg-time{float:right;font-size:9px;color:var(--muted);margin:8px 0 0 13px}
-.composer{margin:0 14px 10px;padding:7px;border:1px solid var(--line);border-radius:12px;display:flex;gap:8px}
-.composer input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:10px;font-size:12px}
-.send{width:40px;border:0;border-radius:9px;background:var(--green);color:#fff;font-size:17px}
-.encryption{margin:0 16px 15px;text-align:center;color:#286341;background:#eaf2e7;padding:9px;border-radius:8px;font-size:10px}
-.empty{margin:auto;padding:25px;text-align:center;color:var(--muted);font-size:11px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#17372d;color:#fff;padding:11px 15px;border-radius:10px;box-shadow:var(--shadow);font-size:11px;z-index:10;max-width:calc(100vw - 24px)}
-
-/* MOBILE */
-@media(max-width:800px){
-.login-shell{grid-template-columns:1fr;min-height:auto;max-width:500px}
-.login-brand{min-height:280px;padding:32px}
-.brand-content h1{font-size:32px}
-.security{margin-top:25px}
-.login-form-area{padding:35px 28px}
-}
-@media(max-width:680px){
-#login-screen{padding:12px}
-.login-shell{border-radius:20px}
-.login-brand{min-height:245px;padding:27px}
-.brand-content h1{font-size:29px}
-.brand-content p{font-size:11px}
-.login-form-area{padding:28px 20px}
-.login-box h2{font-size:25px}
-.layout{display:flex;flex-direction:column;padding:9px;gap:9px}
-.side{min-height:auto;padding:11px;border-radius:14px;position:sticky;top:0;z-index:3}
-.side .brand{padding:0 2px 8px}
-.side .brand-icon{width:34px;height:34px;font-size:21px}
-.side .brand b{font-size:16px}
-.side .brand small{font-size:9px}
-.nav{display:flex;gap:5px}
-.nav a{padding:8px 9px;font-size:10px}
-.side-note{display:none}
-.side-bottom{margin-top:6px}
-.side-bottom span{display:none}
-.panel{min-height:calc(100vh - 85px);border-radius:14px}
-.top{padding:14px;min-height:82px}
-.top h1{font-size:19px}
-.top p{font-size:10px}
-.room-head{padding:11px}
-.people{width:43px;height:43px;font-size:20px}
-.room-title h2{font-size:14px}
-.picker{padding:8px;gap:5px;flex-wrap:wrap}
-.picker select{max-width:none}
-.join{width:100%;margin:0}
-.join input{width:auto;max-width:none;flex:1}
-.messages{max-height:none;padding:13px;min-height:240px}
-}
+.composer{margin:8px 24px 0;display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 5px 5px 18px;background:var(--paper)}
+.composer input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:14px}
+.send{width:44px;height:44px;border:0;border-radius:50%;background:var(--green);color:#fff;font-size:17px}
+.enc{margin:10px 24px 24px;padding:12px;border-radius:999px;background:var(--soft);text-align:center;font-size:12px;color:#286341}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:11px 15px;border-radius:10px;box-shadow:0 18px 55px rgba(26,52,35,.2);font-size:12px;z-index:10;max-width:calc(100vw - 24px)}
+@media(max-width:420px){.pw-rules{font-size:12px}.head b{font-size:22px}}
 </style>
 </head>
 <body>
 
-<!-- 1. LOGIN -->
-<section id="login-screen">
-  <div class="login-shell">
-    <div class="login-brand">
-      <div class="brand-top">
-        <div class="brand-icon">⬡</div>
-        <div class="brand-name"><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div>
-      </div>
-      <div class="brand-content">
-        <span class="eyebrow">TƏHLÜKƏSİZ QRUP YAZIŞMASI</span>
-        <h1>Söhbətə təhlükəsiz şəkildə qoşulun.</h1>
-        <p>Hesabınıza daxil olun, qrup kodunuzu göndərin və admin təsdiqindən sonra qrup yazışmalarına qoşulun.</p>
-      </div>
-      <div class="security">
-        <span class="security-icon">🔒</span>
-        <span>Yazışmalar yalnız icazəli qrup üzvlərinə açıqdır.</span>
-      </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 64 64"><path d="M32 4l24 14v28L32 60 8 46V18z" fill="none" stroke="#f3bd57" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="6" fill="#f3bd57"/><path d="M21 45c0-7 5-11 11-11s11 4 11 11z" fill="#f3bd57"/><circle cx="21.5" cy="29" r="4" fill="#f3bd57" opacity=".85"/><circle cx="42.5" cy="29" r="4" fill="#f3bd57" opacity=".85"/></symbol></svg>
+<svg class="bg tl" viewBox="0 0 400 260" aria-hidden="true"><path d="M350 0C260 55 150 95 0 200V0Z" fill="#f3bd57"/><path d="M330 0C245 50 140 88 0 180V0Z" fill="#17372d"/></svg>
+<svg class="bg br" viewBox="0 0 400 260" aria-hidden="true"><path d="M350 0C260 55 150 95 0 200V0Z" fill="#f3bd57"/><path d="M330 0C245 50 140 88 0 180V0Z" fill="#17372d"/></svg>
+
+<!-- LOGIN / QEYDİYYAT -->
+<section id="login-screen" class="card">
+  <div class="head">
+    <svg class="logo"><use href="#logo"/></svg>
+    <div><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div>
+    <svg class="wave" viewBox="0 0 400 42" preserveAspectRatio="none"><path d="M0 22C110 50 270 40 400 2V42H0Z" fill="#f3bd57"/><path d="M0 30C110 58 270 48 400 12V42H0Z" fill="#fffefa"/></svg>
+  </div>
+
+  <div id="form-view">
+    <div class="tabs">
+      <button id="tab-login" type="button" class="active">Daxil ol</button>
+      <button id="tab-signup" type="button">Qeydiyyat</button>
     </div>
+    <div class="pad">
+      <h2 id="auth-title">Xoş gəlmisiniz</h2>
+      <p id="auth-description" class="desc">Hesabınıza daxil olun və qrup çatı ilə davam edin.</p>
 
-    <div class="login-form-area">
-      <div class="login-box">
-        <span class="eyebrow">CHATBOT HESAB</span>
-        <h2 id="auth-title">Xoş gəlmisiniz</h2>
-        <p id="auth-description">Hesabınıza daxil olun və qrup çatı ilə davam edin.</p>
+      <form id="auth-form" class="form" novalidate>
+        <div class="inp"><i>✉</i><input id="email" type="email" autocomplete="email" required placeholder="E-poçt ünvanı"></div>
+        <div class="inp"><i>🔒</i><input id="password" type="password" autocomplete="current-password" required placeholder="Şifrə"><button id="password-toggle" type="button" class="password-toggle" aria-label="Şifrəni göstər/gizlət">Göstər</button></div>
+        <div id="confirm-field" class="inp hidden"><i>🔒</i><input id="password2" type="password" autocomplete="new-password" placeholder="Şifrəni təsdiqlə"></div>
+        <ul id="pw-rules" class="pw-rules hidden">
+          <li data-rule="len">Ən azı 8 simvol</li>
+          <li data-rule="upper">1 böyük hərf</li>
+          <li data-rule="lower">1 kiçik hərf</li>
+          <li data-rule="digit">1 rəqəm</li>
+          <li data-rule="symbol">1 simvol</li>
+        </ul>
+        <button id="auth-submit" class="btn" type="submit">Daxil ol</button>
+      </form>
 
-        <form id="auth-form" class="login-form" novalidate>
-          <div class="field">
-            <label for="email">E-poçt</label>
-            <input id="email" type="email" autocomplete="email" required placeholder="ad@numune.az">
-          </div>
-
-          <div class="field">
-            <label for="password">Şifrə</label>
-            <div class="password-wrap">
-              <input id="password" type="password" autocomplete="current-password" required placeholder="Şifrənizi daxil edin">
-              <button id="password-toggle" type="button" class="password-toggle" aria-label="Şifrəni göstər/gizlət">Göstər</button>
-            </div>
-            <ul id="pw-rules" class="pw-rules hidden">
-              <li data-rule="len">Ən azı 8 simvol</li>
-              <li data-rule="upper">1 böyük hərf</li>
-              <li data-rule="lower">1 kiçik hərf</li>
-              <li data-rule="digit">1 rəqəm</li>
-              <li data-rule="symbol">1 simvol (məs. ! @ # $ %)</li>
-            </ul>
-          </div>
-
-          <button id="auth-submit" class="login-button" type="submit">Daxil ol</button>
-        </form>
-
-        <div class="register-row">
-          <span id="register-text">Hesabınız yoxdur?</span>
-          <button id="auth-toggle" class="register-button" type="button">Hesab yarat</button>
-        </div>
-
-        <div class="login-note">🔐 Giriş etdikdən sonra qrup çatı açılacaq.</div>
-      </div>
+      <div class="reg"><span id="register-text">Hesabınız yoxdur?</span><button id="auth-toggle" type="button">Hesab yarat</button></div>
     </div>
+  </div>
+
+  <div id="success-view" class="pad success hidden">
+    <div class="check">✓</div>
+    <h2>Qeydiyyatdan keçdiz!</h2>
+    <h3>Adminindən cavab gözləyin.</h3>
+    <p>Dəvət kodunuz təsdiqləndikdən sonra qrupa daxil ola biləcəksiniz.</p>
+    <p id="success-extra" class="hidden">E-poçt təsdiqi tələb olunursa, əvvəlcə poçtunuzu təsdiqləyin.</p>
+    <button id="go-home" type="button" class="btn soft">🏠 Əsas səhifə</button>
   </div>
 </section>
 
-<!-- 2. APP -->
-<section id="app" class="hidden">
-  <div class="layout">
-    <aside class="side">
-      <a class="brand" href="/">
-        <span class="brand-icon">⬡</span>
-        <span><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></span>
-      </a>
-
-      <nav class="nav"><a class="active" href="/">◉ &nbsp; Qrup Çatı</a></nav>
-
-      <div class="side-note">🔒 &nbsp; Yazışmaları yalnız həmin qrupa qoşulmuş üzvlər görə bilər.</div>
-
-      <div class="side-bottom">
-        <span>Chatbot v1.2</span>
-        <button id="signout">Çıxış</button>
-      </div>
-    </aside>
-
-    <main class="panel chat">
-      <header class="top">
-        <div>
-          <span class="eyebrow">ŞƏXSİ QRUP ÇATLARI</span>
-          <h1>Qrup Çatı</h1>
-          <p id="account-label">Hesabınızla daxil oldunuz.</p>
-        </div>
-        <span id="account-avatar" class="avatar">A</span>
-      </header>
-
-      <section id="chat-app" class="chat-app">
-        <header class="room-head">
-          <div class="people">♟</div>
-          <div class="room-title">
-            <h2 id="room-name">Qrup seçin</h2>
-            <p id="room-info">Söhbətə qoşulmaq üçün qrup seçin.</p>
-          </div>
-          <span class="verified">● Təhlükəsiz</span>
-        </header>
-
-        <div class="picker">
-          <label for="groups">Qrup</label>
-          <select id="groups"><option value="">Qrup seçin</option></select>
-
-          <form id="join-form" class="join">
-            <input id="invite" required placeholder="Dəvət kodu">
-            <button class="button" type="submit">Qoşul</button>
-          </form>
-        </div>
-
-        <div class="code-line">
-          Dəvət kodu
-          <b id="group-code">—</b>
-          <button id="copy-code" class="copy" type="button">Kopyala</button>
-        </div>
-
-        <div id="messages" class="messages">
-          <div class="empty">Mesajları görmək üçün qrup seçin.</div>
-        </div>
-
-        <form id="message-form" class="composer">
-          <input id="message" maxlength="4000" autocomplete="off" placeholder="Mesaj yazın…">
-          <button class="send" type="submit" aria-label="Mesaj göndər">➤</button>
-        </form>
-
-        <div class="encryption">🔒 Qrup mesajları yalnız qrup üzvlərinə açıqdır.</div>
-      </section>
-    </main>
+<!-- QRUP ÇATI -->
+<section id="app" class="card hidden">
+  <div class="head">
+    <svg class="logo"><use href="#logo"/></svg>
+    <div><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div>
+    <div class="right">
+      <button id="signout" type="button" class="linkbtn">Çıxış</button>
+      <span id="account-avatar" class="avatar">A</span>
+    </div>
+    <svg class="wave" viewBox="0 0 400 42" preserveAspectRatio="none"><path d="M0 22C110 50 270 40 400 2V42H0Z" fill="#f3bd57"/><path d="M0 30C110 58 270 48 400 12V42H0Z" fill="#fffefa"/></svg>
   </div>
+
+  <div class="sub">
+    <div><h1>Qrup Çatı</h1><p>Təhlükəsiz söhbət mühiti</p></div>
+    <span class="ok">Təhlükəsiz</span>
+  </div>
+  <div class="hidden"><span id="account-label"></span><span id="room-name"></span><span id="room-info"></span></div>
+
+  <div class="row"><div class="pill"><label for="groups">Qrup</label><select id="groups"><option value="">Qrup seçin</option></select></div></div>
+
+  <form id="join-form" class="row join">
+    <div class="pill"><input id="invite" required placeholder="Dəvət kodu"></div>
+    <button class="btn" type="submit">Qoşul</button>
+  </form>
+
+  <div class="code-line">Dəvət kodu: <b id="group-code">—</b> <button id="copy-code" class="copy" type="button">Kopyala</button></div>
+
+  <div id="messages" class="messages"><div class="empty">Mesajları görmək üçün qrup seçin.</div></div>
+
+  <form id="message-form" class="composer">
+    <input id="message" maxlength="4000" autocomplete="off" placeholder="Mesaj yazın…">
+    <button class="send" type="submit" aria-label="Mesaj göndər">➤</button>
+  </form>
+
+  <div class="enc">🔒 Qrup mesajları yalnız qrup üzvlərinə açıqdır.</div>
 </section>
 
 <div id="toast" class="toast hidden"></div>
@@ -306,6 +198,7 @@ let activeGroup = null;
 let realtime = null;
 let signup = false;
 let selectToken = 0;
+let pendingSuccess = false;
 
 /* ===== ŞİFRƏ QAYDASI (qeydiyyat üçün məcburi) ===== */
 const PW_RULES = {
@@ -376,8 +269,9 @@ function showAuth(session){
   currentUid = newUid;
   const signed = !!user;
 
-  $('#login-screen').classList.toggle('hidden', signed);
-  $('#app').classList.toggle('hidden', !signed);
+  const showApp = signed && !pendingSuccess;
+  $('#login-screen').classList.toggle('hidden', showApp);
+  $('#app').classList.toggle('hidden', !showApp);
 
   if(signed){
     $('#account-avatar').textContent = user.email?.[0]?.toUpperCase() || 'A';
@@ -526,27 +420,39 @@ if(!configured){
   /* --- Qeydiyyat / giriş keçidi --- */
   $('#password').addEventListener('input', renderPwRules);
 
-  $('#auth-toggle').onclick = () => {
-    signup = !signup;
-
-    if(signup){
-      $('#auth-title').textContent = 'Hesab yaradın';
-      $('#auth-description').textContent = 'Yeni hesab yaradın və sonra qrupa qoşulun.';
-      $('#auth-submit').textContent = 'Hesab yarat';
-      $('#auth-toggle').textContent = 'Daxil ol';
-      $('#register-text').textContent = 'Artıq hesabınız var?';
-      $('#password').autocomplete = 'new-password';
-    }else{
-      $('#auth-title').textContent = 'Xoş gəlmisiniz';
-      $('#auth-description').textContent = 'Hesabınıza daxil olun və qrup çatı ilə davam edin.';
-      $('#auth-submit').textContent = 'Daxil ol';
-      $('#auth-toggle').textContent = 'Hesab yarat';
-      $('#register-text').textContent = 'Hesabınız yoxdur?';
-      $('#password').autocomplete = 'current-password';
-    }
-
-    $('#pw-rules').classList.toggle('hidden', !signup);
+  function setMode(on){
+    signup = on;
+    $('#tab-login').classList.toggle('active', !on);
+    $('#tab-signup').classList.toggle('active', on);
+    $('#auth-title').textContent = on ? 'Hesab Yarat' : 'Xoş gəlmisiniz';
+    $('#auth-description').textContent = on
+      ? 'Yeni hesab yaradın və qrup çatı ilə davam edin.'
+      : 'Hesabınıza daxil olun və qrup çatı ilə davam edin.';
+    $('#auth-submit').textContent = on ? 'Hesab yarat' : 'Daxil ol';
+    $('#register-text').textContent = on ? 'Artıq hesabınız var?' : 'Hesabınız yoxdur?';
+    $('#auth-toggle').textContent = on ? 'Daxil ol' : 'Hesab yarat';
+    $('#password').autocomplete = on ? 'new-password' : 'current-password';
+    $('#pw-rules').classList.toggle('hidden', !on);
+    $('#confirm-field').classList.toggle('hidden', !on);
     renderPwRules();
+  }
+  $('#tab-login').onclick = () => setMode(false);
+  $('#tab-signup').onclick = () => setMode(true);
+  $('#auth-toggle').onclick = () => setMode(!signup);
+
+  function showSuccess(needsEmail){
+    $('#form-view').classList.add('hidden');
+    $('#success-view').classList.remove('hidden');
+    $('#success-extra').classList.toggle('hidden', !needsEmail);
+  }
+
+  $('#go-home').onclick = () => {
+    pendingSuccess = false;
+    $('#success-view').classList.add('hidden');
+    $('#form-view').classList.remove('hidden');
+    $('#password').value = ''; $('#password2').value = '';
+    setMode(false);
+    if(user){ const u = user; currentUid = null; showAuth({ user: u }); }
   };
 
   /* --- Şifrəni göstər/gizlət --- */
@@ -572,20 +478,20 @@ if(!configured){
       return toast('Şifrə tələbləri ödəmir: 8+ simvol, böyük və kiçik hərf, rəqəm və simvol.');
     }
 
+    if(signup && $('#password2').value !== password) return toast('Şifrələr eyni deyil.');
+
     button.disabled = true;
     button.textContent = signup ? 'Hesab yaradılır...' : 'Daxil olunur...';
 
+    pendingSuccess = signup;
     try{
       const { data, error } = signup
         ? await supabase.auth.signUp({ email, password })
         : await supabase.auth.signInWithPassword({ email, password });
 
-      if(error) return toast(error.message);
+      if(error){ pendingSuccess = false; return toast(error.message); }
 
-      if(signup && !data.session){
-        toast('E-poçtunuzu təsdiqləyin, sonra daxil olun.');
-        return;
-      }
+      if(signup){ showSuccess(!data.session); return; }
       // Uğurlu girişdə onAuthStateChange ekranı avtomatik dəyişir.
     }finally{
       button.disabled = false;
