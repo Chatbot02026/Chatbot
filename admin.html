@@ -292,7 +292,9 @@ async function checkAdmin(){
     await supabase.auth.signOut();
     loginPage.classList.remove("hidden");
     adminPage.classList.add("hidden");
-    showLoginError("Bu hesabın admin panelinə giriş icazəsi yoxdur.");
+    showLoginError(error
+      ? "Verilənlər bazası xətası: " + error.message + " (schema.sql-i Supabase-də işə salın)"
+      : "Bu hesabın admin panelinə giriş icazəsi yoxdur.");
     return false;
   }
 
@@ -316,7 +318,9 @@ $("loginForm").addEventListener("submit", async e => {
   });
 
   if(error){
-    showLoginError("Email və ya şifrə yanlışdır.");
+    showLoginError(error.message === "Invalid login credentials"
+      ? "Email və ya şifrə yanlışdır."
+      : error.message);
     loginButton.disabled = false;
     loginButton.textContent = "Daxil ol";
     return;
@@ -450,13 +454,20 @@ async function deleteGroup(groupId){
 }
 
 /* ===== QOŞULMA SORĞULARI ===== */
+const STATUS_AZ = {
+  pending: "Gözləyir",
+  approved: "Təsdiqləndi",
+  rejected: "Rədd edildi",
+  threat: "Təhlükə"
+};
+
 async function loadRequests(){
   const container = $("requestsList");
   container.innerHTML = '<div class="loading">Sorğular yüklənir...</div>';
 
   const { data, error } = await supabase
     .from("join_requests")
-    .select("id,user_id,group_id,entered_code,status,created_at")
+    .select("id,user_id,user_email,group_id,entered_code,status,created_at")
     .order("created_at", { ascending:false });
 
   if(error){
@@ -494,8 +505,8 @@ async function loadRequests(){
 
     div.innerHTML = `
       <div class="request-top">
-        <div class="request-user">👤 ${escapeHtml(request.user_id)}</div>
-        <span class="status ${escapeHtml(request.status)}">${escapeHtml(request.status)}</span>
+        <div class="request-user">👤 ${escapeHtml(request.user_email || request.user_id)}</div>
+        <span class="status ${escapeHtml(request.status)}">${escapeHtml(STATUS_AZ[request.status] || request.status)}</span>
       </div>
       <div class="request-line"><strong>Qrup:</strong> ${escapeHtml(groupName)}</div>
       <div class="request-line"><strong>Daxil edilən kod:</strong> <code>${escapeHtml(request.entered_code || "-")}</code></div>
