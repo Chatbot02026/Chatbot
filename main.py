@@ -21,6 +21,7 @@ STATIC_FILES: dict[str, tuple[str, str]] = {
     "manifest.json": (MANIFEST, "no-cache"),
     "icon-192.png": (PNG, "public, max-age=86400"),
     "icon-512.png": (PNG, "public, max-age=86400"),
+    "icon-maskable-512.png": (PNG, "public, max-age=86400"),
 }
 
 SECURITY_HEADERS = {
