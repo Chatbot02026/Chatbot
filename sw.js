@@ -1,50 +1,68 @@
-// Chatbot service worker: tətbiq qabığını (shell) offline açmaq üçün.
-// Supabase sorğuları (başqa domen) və /api/ heç vaxt keşlənmir; mesajlar həmişə canlı gəlir.
+// Chatbot service worker
+// Təhlükəsizlik: yazışmalar, Supabase və başqa domen sorğuları HEÇ VAXT keşlənmir.
+// Yalnız tətbiqin öz statik faylları (qabıq) keşlənir.
+
 const CACHE = 'chatbot-shell-v1';
 const SHELL = [
   '/',
-  '/admin.html',
-  '/supabase-config.js',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE)
-      .then(cache => Promise.allSettled(SHELL.map(url => cache.add(url))))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE).then((cache) =>
+      // Bir fayl tapılmasa belə quraşdırma pozulmasın
+      Promise.all(SHELL.map((url) => cache.add(url).catch(() => null)))
+    )
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith('/api/')) return;
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
 
-  // Şəbəkə birinci: həmişə ən yeni versiya, şəbəkə yoxdursa keşdən.
+  // Yalnız GET və yalnız öz domenimiz
+  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // Səhifə açılışı: əvvəl şəbəkə, internet yoxdursa keşdən
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put('/index.html', copy));
+          return res;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Statik fayllar: əvvəl keş, sonra şəbəkə
   event.respondWith(
-    fetch(request)
-      .then(response => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE).then(cache => cache.put(request, copy)).catch(() => {});
-        }
-        return response;
-      })
-      .catch(() =>
-        caches.match(request).then(hit => hit || (request.mode === 'navigate' ? caches.match('/') : Response.error()))
-      )
+    caches.match(req).then(
+      (hit) =>
+        hit ||
+        fetch(req).then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+    )
   );
 });
