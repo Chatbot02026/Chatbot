@@ -397,8 +397,7 @@ async function loadGroups(){
   const container = $("groupsList");
   container.innerHTML = '<div class="loading">Qruplar yüklənir...</div>';
 
-  const { data, error } = await supabase
-    .from("groups").select("*").order("created_at", { ascending:false });
+  const { data, error } = await supabase.rpc("admin_list_groups");
 
   if(error){
     container.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
