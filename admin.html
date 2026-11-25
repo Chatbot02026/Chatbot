@@ -127,6 +127,8 @@ h1,h2,.brand-name,.topbar-title,.login-title{font-family:'Manrope',sans-serif}
 .msg{padding:11px 14px;border:1px solid var(--border);border-radius:14px;background:#fffefa}
 .msg-meta{font-size:11px;color:var(--muted);margin-bottom:4px}
 .msg-body{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.msg-form{display:flex;gap:10px;margin-top:14px}
+.msg-form input{flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fffefa;font-size:13px;color:var(--text)}
 </style>
 </head>
 <body>
@@ -259,7 +261,7 @@ h1,h2,.brand-name,.topbar-title,.login-title{font-family:'Manrope',sans-serif}
         <div class="section-header">
           <div>
             <h2>Qrup mesajları</h2>
-            <div class="section-description">Qrup seçin və mesajları oxuyun (yalnız oxumaq).</div>
+            <div class="section-description">Qrup seçin, mesajları oxuyun və admin kimi mesaj yazın.</div>
           </div>
         </div>
         <div class="msg-toolbar">
@@ -267,6 +269,10 @@ h1,h2,.brand-name,.topbar-title,.login-title{font-family:'Manrope',sans-serif}
           <button id="msgRefresh" class="secondary" type="button">🔄 Yenilə</button>
         </div>
         <div id="msgList" class="msg-list"><div class="empty">Qrup seçin.</div></div>
+        <form id="msgForm" class="msg-form">
+          <input id="msgInput" type="text" maxlength="2000" placeholder="Mesaj yazın..." autocomplete="off">
+          <button id="msgSend" class="primary" type="submit">Göndər</button>
+        </form>
       </div>
     </div>
   </main>
@@ -442,12 +448,12 @@ function fillMsgGroups(groups){
   if(prev && groups.some(g => g.id === prev)) sel.value = prev;
 }
 
-async function loadAdminMessages(){
+async function loadAdminMessages(silent = false){
   const box = $("msgList");
   const gid = $("msgGroup").value;
   if(!gid){ box.innerHTML = '<div class="empty">Qrup seçin.</div>'; return; }
 
-  box.innerHTML = '<div class="loading">Mesajlar yüklənir...</div>';
+  if(!silent) box.innerHTML = '<div class="loading">Mesajlar yüklənir...</div>';
   const { data, error } = await supabase.rpc("admin_group_messages", { target_group: gid, max_rows: 300 });
 
   if(error){
@@ -471,8 +477,34 @@ async function loadAdminMessages(){
   box.scrollTop = box.scrollHeight;
 }
 
-$("msgGroup").addEventListener("change", loadAdminMessages);
-$("msgRefresh").addEventListener("click", loadAdminMessages);
+$("msgGroup").addEventListener("change", () => loadAdminMessages());
+$("msgRefresh").addEventListener("click", () => loadAdminMessages());
+
+$("msgForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const gid = $("msgGroup").value;
+  const body = $("msgInput").value.trim();
+  if(!gid) return alert("Əvvəlcə qrup seçin.");
+  if(!body) return;
+
+  const btn = $("msgSend");
+  btn.disabled = true;
+  const { error } = await supabase.from("messages").insert({ group_id: gid, body });
+  btn.disabled = false;
+
+  if(error) return alert(error.message);
+  $("msgInput").value = "";
+  await loadAdminMessages(true);
+});
+
+// Yeni mesaj gələndə seçilmiş qrupun siyahısını avtomatik yenilə
+supabase
+  .channel("admin-messages")
+  .on("postgres_changes", { event:"INSERT", schema:"public", table:"messages" }, payload => {
+    if(adminPage.classList.contains("hidden")) return;
+    if(payload.new && payload.new.group_id === $("msgGroup").value) loadAdminMessages(true);
+  })
+  .subscribe();
 
 /* ===== QRUP YARAT ===== */
 $("createGroupBtn").addEventListener("click", async () => {
