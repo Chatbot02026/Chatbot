@@ -167,8 +167,6 @@ h2{font:800 32px Manrope;letter-spacing:-.8px;margin:6px 0 6px;text-align:center
     <button class="btn" type="submit">Qoşul</button>
   </form>
 
-  <div class="code-line">Dəvət kodu: <b id="group-code">—</b> <button id="copy-code" class="copy" type="button">Kopyala</button></div>
-
   <div id="messages" class="messages"><div class="empty">Mesajları görmək üçün qrup seçin.</div></div>
 
   <form id="message-form" class="composer">
@@ -243,7 +241,6 @@ function resetRoom(
 ){
   $('#room-name').textContent = title;
   $('#room-info').textContent = info;
-  $('#group-code').textContent = '—';
   $('#messages').innerHTML = `<div class="empty">${safe(empty)}</div>`;
 }
 
@@ -311,7 +308,7 @@ function showAuth(session){
 async function loadGroups(){
   const { data, error } = await supabase
     .from('groups')
-    .select('id,name,invite_code,created_at')
+    .select('id,name,created_at')
     .order('created_at', { ascending:false });
 
   if(error) return toast(error.message);
@@ -348,7 +345,7 @@ async function chooseGroup(id){
 
   const { data:g, error } = await supabase
     .from('groups')
-    .select('id,name,invite_code')
+    .select('id,name')
     .eq('id', id)
     .single();
 
@@ -358,7 +355,6 @@ async function chooseGroup(id){
   activeGroup = g;
   $('#room-name').textContent = g.name;
   $('#room-info').textContent = 'Qrup üzvləri ilə təhlükəsiz söhbət';
-  $('#group-code').textContent = g.invite_code;
 
   // Realtime əvvəl qoşulur, sonra tarixçə yüklənir
   realtime = supabase
@@ -552,17 +548,6 @@ if(!configured){
       return toast('Sorğu adminə göndərildi. Təsdiqdən sonra qrup siyahıda görünəcək.');
     }
     toast('Dəvət kodu tapılmadı.');
-  };
-
-  /* --- Kodu kopyala --- */
-  $('#copy-code').onclick = async () => {
-    if(!activeGroup) return toast('Əvvəlcə qrup seçin.');
-    try{
-      await navigator.clipboard.writeText(activeGroup.invite_code);
-      toast('Dəvət kodu kopyalandı.');
-    }catch(_){
-      toast('Kopyalamaq alınmadı. Kodu əl ilə seçin: ' + activeGroup.invite_code);
-    }
   };
 
   /* --- Mesaj göndər --- */
