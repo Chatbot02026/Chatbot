@@ -1,20 +1,21 @@
 // Chatbot service worker
-// Təhlükəsizlik: yazışmalar, Supabase və başqa domen sorğuları HEÇ VAXT keşlənmir.
-// Yalnız tətbiqin öz statik faylları (qabıq) keşlənir.
+// Təhlükəsizlik: yazışmalar, Supabase, /api və admin panel HEÇ VAXT keşlənmir.
+// Yalnız tətbiqin öz statik qabığı (index.html, manifest, ikonlar) keşlənir.
 
-const CACHE = 'chatbot-shell-v1';
+const CACHE = 'chatbot-shell-v2';
 const SHELL = [
   '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
+
+// Bu yollar həmişə birbaşa şəbəkədən gedir
+const BYPASS = [/^\/api\//, /^\/admin/, /^\/supabase-config\.js$/, /^\/sw\.js$/];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
-      // Bir fayl tapılmasa belə quraşdırma pozulmasın
       Promise.all(SHELL.map((url) => cache.add(url).catch(() => null)))
     )
   );
@@ -36,22 +37,26 @@ self.addEventListener('fetch', (event) => {
 
   // Yalnız GET və yalnız öz domenimiz
   if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (BYPASS.some((re) => re.test(url.pathname))) return;
 
-  // Səhifə açılışı: əvvəl şəbəkə, internet yoxdursa keşdən
+  // Çat səhifəsinin açılışı: əvvəl şəbəkə, internet yoxdursa keşdən
   if (req.mode === 'navigate') {
+    const isHome = url.pathname === '/' || url.pathname === '/index.html';
     event.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put('/index.html', copy));
+          if (isHome && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put('/', copy));
+          }
           return res;
         })
-        .catch(() => caches.match('/index.html'))
+        .catch(() => (isHome ? caches.match('/') : Response.error()))
     );
     return;
   }
 
-  // Statik fayllar: əvvəl keş, sonra şəbəkə
+  // Statik fayllar (manifest, ikonlar): əvvəl keş, sonra şəbəkə
   event.respondWith(
     caches.match(req).then(
       (hit) =>
