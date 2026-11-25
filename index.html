@@ -134,9 +134,9 @@ h2{font:800 32px Manrope;letter-spacing:-.8px;margin:6px 0 6px;text-align:center
 
   <div id="success-view" class="pad success hidden">
     <div class="check">✓</div>
-    <h2>Qeydiyyatdan keçdiz!</h2>
-    <h3>Adminindən cavab gözləyin.</h3>
-    <p>Dəvət kodunuz təsdiqləndikdən sonra qrupa daxil ola biləcəksiniz.</p>
+    <h2>Qeydiyyatdan keçdiniz!</h2>
+    <h3>Admin təsdiqini gözləyin.</h3>
+    <p>Növbəti addımda dəvət kodunu yazın. Admin sorğunuzu təsdiqləyəndən sonra qrupa daxil ola biləcəksiniz.</p>
     <p id="success-extra" class="hidden">E-poçt təsdiqi tələb olunursa, əvvəlcə poçtunuzu təsdiqləyin.</p>
     <button id="go-home" type="button" class="btn soft">🏠 Əsas səhifə</button>
   </div>
@@ -196,6 +196,7 @@ let user = null;
 let currentUid = null;
 let activeGroup = null;
 let realtime = null;
+let membersChannel = null;
 let signup = false;
 let selectToken = 0;
 let pendingSuccess = false;
@@ -254,6 +255,24 @@ async function stopRealtime(){
   try{ await supabase.removeChannel(channel); }catch(_){}
 }
 
+/* ===== ÜZVLÜK KANALI: admin təsdiqləyəndə qrup avtomatik görünür ===== */
+async function stopMembers(){
+  if(!membersChannel) return;
+  const channel = membersChannel;
+  membersChannel = null;
+  try{ await supabase.removeChannel(channel); }catch(_){}
+}
+
+function watchMembership(uid){
+  stopMembers();
+  membersChannel = supabase
+    .channel(`members-${uid}`)
+    .on('postgres_changes',
+      { event:'INSERT', schema:'public', table:'group_members', filter:`user_id=eq.${uid}` },
+      () => { loadGroups(); toast('Admin sorğunuzu təsdiqlədi. Qrup siyahıya əlavə olundu.'); })
+    .subscribe();
+}
+
 /* ===== LOGIN / LOGOUT UI ===== */
 function showAuth(session){
   const newUser = session?.user || null;
@@ -277,7 +296,9 @@ function showAuth(session){
     $('#account-avatar').textContent = user.email?.[0]?.toUpperCase() || 'A';
     $('#account-label').textContent = user.email || '';
     loadGroups();
+    watchMembership(newUid);
   }else{
+    stopMembers();
     activeGroup = null;
     selectToken++;
     stopRealtime();
@@ -519,10 +540,18 @@ if(!configured){
     if(error) return toast(error.message);
 
     $('#invite').value = '';
-    await loadGroups();
-    $('#groups').value = data;
-    await chooseGroup(data);
-    toast('Qrupa qoşuldunuz.');
+
+    // Cavab: { status: 'member' | 'pending' | 'invalid' }
+    if(data?.status === 'member'){
+      await loadGroups();
+      $('#groups').value = data.group_id;
+      await chooseGroup(data.group_id);
+      return toast('Qrupa qoşuldunuz.');
+    }
+    if(data?.status === 'pending'){
+      return toast('Sorğu adminə göndərildi. Təsdiqdən sonra qrup siyahıda görünəcək.');
+    }
+    toast('Dəvət kodu tapılmadı.');
   };
 
   /* --- Kodu kopyala --- */
