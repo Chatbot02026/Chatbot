@@ -167,12 +167,6 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
 /* ===== Məlumat qatı =====
    Hazırda DEMO məlumatdır. Öz Supabase kodunuzu yalnız bu obyektin
    funksiyalarına bağlayın — qalan interfeys dəyişməz qalır. */
-const db = {
-  groups:[{id:'eff9ba2e-7c20-4ea5-bd26-fdbd4e327716',name:'fetö',code:'C6E9497F1616'},{id:'75c1542f-d664-4314-833e-0de7a15575fa',name:'PKk',code:'31BBA902A413'}],
-  requests:[{id:1,user:'Aysel M.',group:'PKk'}],
-  messages:{'eff9ba2e-7c20-4ea5-bd26-fdbd4e327716':[],'75c1542f-d664-4314-833e-0de7a15575fa':[{me:false,who:'Aysel M.',text:'Salam, qoşula bilərəm?'}]},
-  feed:[{t:'Aysel M. «PKk» qrupuna qoşulmaq istəyir'},{t:'«fetö» qrupu yaradıldı'}]
-};
 const api = {
   async login(email,pass){ /* TODO: supabase.auth.signInWithPassword({email,password:pass}) */ return {email}; },
   async logout(){ /* TODO: supabase.auth.signOut() */ },
