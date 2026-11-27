@@ -3,121 +3,173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#17372d">
+<meta name="theme-color" content="#05070d">
 <meta name="description" content="Chatbot — təhlükəsiz qrup çatı">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>Chatbot — Giriş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
-:root{--green:#17372d;--gold:#f3bd57;--line:#e7e5dd;--muted:#77827a;--soft:#eaf2e7;--paper:#fffefa}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{min-height:100vh;font-family:'DM Sans',sans-serif;color:#1a2c23;background:#fbf8f1;display:flex;justify-content:center;padding:22px 14px}
-button,input,select{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-.bg{position:fixed;width:min(46vw,420px);pointer-events:none;z-index:0}
-.bg.tl{top:0;left:0}
-.bg.br{bottom:0;right:0;transform:rotate(180deg)}
-.card{position:relative;z-index:1;width:100%;max-width:480px;margin:auto;background:var(--paper);border-radius:26px;box-shadow:0 18px 55px rgba(26,52,35,.14);overflow:hidden}
-.head{position:relative;background:var(--green);color:#fff;padding:26px 24px 56px;display:flex;align-items:center;gap:14px}
-.head svg.logo{width:58px;height:58px;flex:none}
-.head b{display:block;font:800 26px Manrope}
-.head small{font-size:12px;color:#d5e0d9}
-.head .right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.wave{position:absolute;left:0;bottom:-1px;width:100%;height:42px}
-.avatar{width:42px;height:42px;border:2px solid #cbd8d0;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none}
-.linkbtn{border:0;background:transparent;color:#d5e0d9;font-size:12px}
-.tabs{display:flex;background:#ece9e0;border-radius:999px;margin:6px 24px 0;overflow:hidden}
-.tabs button{flex:1;border:0;background:transparent;padding:13px;font-weight:700;font-size:13px;color:#34483a;border-radius:999px}
-.tabs button.active{background:var(--green);color:#fff}
-.pad{padding:18px 26px 26px}
-h2{font:800 32px Manrope;letter-spacing:-.8px;margin:6px 0 6px;text-align:center}
-.desc{text-align:center;font-size:14px;margin:0 0 20px}
-.form{display:grid;gap:12px}
-.inp{position:relative}
-.inp i{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-style:normal;font-size:15px}
-.inp input{width:100%;padding:15px 64px 15px 48px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:14px;outline:0}
-.inp input:focus{border-color:#8ba993;box-shadow:0 0 0 3px rgba(139,169,147,.12)}
-.password-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#718077;font-size:11px;font-weight:700}
-.pw-rules{list-style:none;margin:0;padding:12px 14px;background:var(--soft);border-radius:14px;display:grid;grid-template-rows:repeat(3,auto);grid-auto-flow:column;gap:6px 10px;font-size:13px}
-.pw-rules li{display:flex;align-items:center;gap:8px;color:#4b5b51}
-.pw-rules li::before{content:"✓";width:18px;height:18px;border-radius:50%;background:#c4cfc7;color:#fff;font-size:11px;display:grid;place-items:center;flex:none}
-.pw-rules li.ok::before{background:#34a55a}
-.btn{width:100%;border:0;border-radius:999px;padding:15px;background:var(--green);color:#fff;font-size:15px;font-weight:800}
-.btn:hover{background:#20503f}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.btn.soft{background:#ece9e0;color:var(--green)}
-.reg{display:flex;justify-content:center;gap:6px;margin-top:14px;font-size:14px}
-.reg button{border:0;background:transparent;color:#d9a02b;font-weight:800;padding:0}
-.success{text-align:center;padding-top:10px}
-.check{width:120px;height:120px;border-radius:50%;margin:6px auto 14px;background:#e3efdc;border:10px solid #f0f5ea;display:grid;place-items:center;font-size:56px;color:var(--green)}
-.success h2{font-size:30px}
-.success h3{font:800 18px Manrope;margin:0 0 14px}
-.success p{margin:0 0 20px;font-size:14px;line-height:1.6}
-.sub{padding:16px 24px 4px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.sub h1{font:800 21px Manrope;margin:0}
-.sub p{margin:3px 0 0;font-size:13px}
-.ok{color:#2f9e55;font-weight:600;font-size:13px;white-space:nowrap}
-.ok::before{content:"● "}
-.row{display:flex;gap:10px;padding:8px 24px 0}
-.pill{display:flex;align-items:center;flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:0 8px 0 16px;background:var(--paper)}
-.pill label{font-size:14px}
-.pill select,.pill input{flex:1;min-width:0;border:0;background:transparent;padding:13px 8px;font-size:15px;outline:0}
-.pill input{padding-left:0}
-.join .btn{width:auto;padding:0 26px;font-size:14px}
-.code-line{margin:10px 24px 0;padding:11px;border-radius:999px;background:var(--soft);text-align:center;font-size:13px}
-.code-line b{margin:0 6px;letter-spacing:.4px}
-.copy{border:1px solid #dce6da;border-radius:999px;padding:5px 12px;background:#fff;color:#34483a;font-size:12px}
-.messages{min-height:240px;max-height:46vh;overflow:auto;padding:12px 24px;display:flex;flex-direction:column;gap:12px}
-.empty{margin:auto;padding:25px;text-align:center;color:#34483a;font-size:15px;line-height:1.5}
-.empty::before{content:"💬";display:block;font-size:46px;filter:grayscale(1) opacity(.45);margin-bottom:8px}
-.message{display:flex;gap:9px;align-items:flex-start;max-width:88%}
-.message.mine{align-self:flex-end;flex-direction:row-reverse}
-.message .avatar{width:32px;height:32px;border-color:transparent;background:var(--green);color:#fff;font-size:12px}
-.bubble-wrap{min-width:70px}
-.sender{font-size:10px;font-weight:700;margin:0 0 4px 4px}
-.message.mine .sender{text-align:right}
-.bubble{background:#f0efeb;border-radius:5px 14px 14px;padding:10px 12px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
-.message.mine .bubble{background:#fff0d8;border-radius:14px 5px 14px 14px}
-.msg-time{float:right;font-size:9px;color:var(--muted);margin:8px 0 0 13px}
-.composer{margin:8px 24px 0;display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 5px 5px 18px;background:var(--paper)}
-.composer input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:14px}
-.send{width:44px;height:44px;border:0;border-radius:50%;background:var(--green);color:#fff;font-size:17px}
-.enc{margin:10px 24px 24px;padding:12px;border-radius:999px;background:var(--soft);text-align:center;font-size:12px;color:#286341}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:11px 15px;border-radius:10px;box-shadow:0 18px 55px rgba(26,52,35,.2);font-size:12px;z-index:10;max-width:calc(100vw - 24px)}
-@media(max-width:420px){.pw-rules{font-size:12px}.head b{font-size:22px}}
+:root{
+  --bg:#05070d; --glass:rgba(16,24,40,.55); --line:rgba(130,180,255,.16);
+  --text:#e8eefc; --muted:#8a97b4; --cyan:#4cc9f0; --pink:#ff4d8d; --amber:#ffb703; --ok:#3ddc97;
+  --r-lg:20px; --r-md:12px; --r-sm:8px;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:400 15px/1.5 Sora,system-ui,sans-serif;overflow-x:hidden}
+#net{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.hidden,[hidden]{display:none!important}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:9px 16px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{background:rgba(255,255,255,.09)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.primary{background:rgba(76,201,240,.14);border-color:rgba(76,201,240,.55);color:var(--cyan)}
+.btn.primary:hover{background:rgba(76,201,240,.25)}
+.btn.danger{background:rgba(255,77,141,.1);border-color:rgba(255,77,141,.5);color:var(--pink)}
+.btn.danger:hover{background:rgba(255,77,141,.2)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.block{width:100%;margin-top:22px;padding:12px}
+.field{width:100%;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--line);background:rgba(5,7,13,.6)}
+.field:focus{border-color:var(--cyan);outline:none}
+.field::placeholder{color:var(--muted)}
+select.field option{background:#0b1220;color:var(--text)}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+
+/* ===== login / qeydiyyat ===== */
+#login-screen{position:fixed;inset:0;z-index:20;display:flex;justify-content:center;padding:20px;overflow:auto}
+.login-card{width:min(420px,100%);margin:auto;padding:32px;border-radius:var(--r-lg)}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}
+.logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:700;color:#05070d;background:linear-gradient(135deg,var(--cyan),var(--pink));flex:none}
+.brand small{display:block;color:var(--muted);font-size:12px}
+.seg{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:var(--r-md);background:rgba(5,7,13,.5);margin-bottom:22px}
+.seg button{flex:1;border:0;background:none;padding:9px;border-radius:var(--r-sm);color:var(--muted);cursor:pointer;font-size:14px;transition:background .15s,color .15s}
+.seg button:hover{color:var(--text)}
+.seg button.active{background:rgba(76,201,240,.14);color:var(--cyan);box-shadow:inset 0 -2px 0 var(--cyan)}
+.login-card h1{font-size:24px;margin-bottom:6px}
+.login-card p.lead{color:var(--muted);margin-bottom:6px;font-size:14px}
+.login-card label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
+.pwwrap{position:relative}
+.pwwrap .field{padding-right:78px}
+.pwtoggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--cyan);font-size:12px;cursor:pointer}
+.pw-rules{
+  list-style:none;margin:14px 0 0;padding:12px 14px;border-radius:var(--r-md);
+  background:rgba(76,201,240,.06);border:1px solid var(--line);
+  display:grid;grid-template-rows:repeat(3,auto);grid-auto-flow:column;gap:6px 10px;font-size:13px;
+}
+.pw-rules li{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.pw-rules li::before{content:"✓";width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);color:#05070d;font-size:11px;font-weight:700;display:grid;place-items:center;flex:none}
+.pw-rules li.ok{color:var(--text)}
+.pw-rules li.ok::before{background:var(--ok);box-shadow:0 0 10px rgba(61,220,151,.6)}
+.reg{display:flex;justify-content:center;gap:6px;margin-top:18px;font-size:14px;color:var(--muted)}
+.reg button{border:0;background:none;color:var(--cyan);font-weight:600;cursor:pointer;padding:0}
+.success{text-align:center}
+.check{width:96px;height:96px;border-radius:50%;margin:4px auto 18px;display:grid;place-items:center;font-size:44px;color:var(--ok);background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.5);box-shadow:0 0 34px rgba(61,220,151,.25)}
+.success h1{margin-bottom:8px}
+.success h3{font-size:16px;font-weight:600;color:var(--amber);margin-bottom:14px}
+.success p{color:var(--muted);font-size:14px;margin-bottom:14px}
+.success .btn{width:100%;padding:12px;margin-top:8px}
+
+/* ===== əsas çərçivə ===== */
+#app{position:relative;z-index:1;display:grid;min-height:100%;grid-template-columns:230px 1fr;grid-template-rows:64px 1fr;gap:16px;padding:16px}
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-radius:var(--r-lg)}
+header .brand{margin:0}
+.who{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
+.who b{font-weight:500;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#05070d;background:linear-gradient(135deg,var(--cyan),var(--pink));flex:none}
+nav{padding:12px;border-radius:var(--r-lg);align-self:start;display:flex;flex-direction:column;gap:4px}
+nav button{display:flex;gap:10px;align-items:center;text-align:left;border:0;background:none;padding:12px 14px;border-radius:var(--r-md);cursor:pointer;color:var(--muted);transition:background .15s,color .15s}
+nav button:hover{background:rgba(255,255,255,.05);color:var(--text)}
+nav button[aria-selected=true]{background:rgba(76,201,240,.14);color:var(--cyan);box-shadow:inset 3px 0 0 var(--cyan)}
+nav .count{margin-left:auto;font:500 12px 'JetBrains Mono',monospace;background:var(--pink);color:#05070d;border-radius:99px;padding:1px 8px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-content:start}
+.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stat{padding:18px 20px;border-radius:var(--r-lg);display:flex;align-items:center;gap:16px}
+.stat .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none}
+.stat strong{font-size:28px;line-height:1;display:block}
+.stat span{color:var(--muted);font-size:13px}
+#st-conn.off{color:var(--muted)}
+#st-conn:not(.off){color:var(--ok)}
+.panel{padding:24px;border-radius:var(--r-lg)}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.panel h2{font-size:18px;margin-bottom:4px}
+.panel h2 span{color:var(--cyan)}
+.panel .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.secure{font-size:12px;color:var(--ok);white-space:nowrap;padding-top:4px}
+.secure::before{content:"● "}
+.row{display:flex;gap:10px}
+.row .field{flex:1;min-width:0;width:auto}
+.chat{display:grid;gap:10px;height:clamp(260px,46vh,440px);overflow:auto;padding:14px;border:1px solid var(--line);border-radius:var(--r-md);background:rgba(5,7,13,.45);align-content:start;margin:14px 0}
+.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:28px;text-align:center;color:var(--muted)}
+.msg{max-width:78%;padding:9px 13px;border-radius:14px;font-size:14px;overflow-wrap:anywhere}
+.msg.me{justify-self:end;background:rgba(76,201,240,.18);border:1px solid rgba(76,201,240,.4)}
+.msg.them{background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.msg small{display:block;color:var(--muted);font-size:11px}
+.msg .t{text-align:right;font-size:10px;margin-top:4px}
+.note{margin-top:16px;padding:10px 14px;border-radius:var(--r-md);background:rgba(61,220,151,.07);border:1px solid rgba(61,220,151,.25);color:var(--ok);font-size:12px;text-align:center}
+.feed{padding:20px;border-radius:var(--r-lg);align-self:start}
+.feed h2{font-size:15px;margin-bottom:14px}
+.feed ul{list-style:none;padding:0;display:grid;gap:14px}
+.feed li{display:flex;gap:10px;font-size:13px;color:var(--muted)}
+.feed li i{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.feed li.ok i{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.feed li.warn i{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.feed li.new i{background:var(--pink);box-shadow:0 0 10px var(--pink)}
+.feed li b{color:var(--text);font-weight:500;display:block}
+.feed li small{display:block;font-size:11px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;z-index:30;padding:10px 18px;border-radius:var(--r-md);transition:.25s;pointer-events:none;max-width:calc(100vw - 24px);font-size:13px}
+#toast.on{opacity:1;transform:translateX(-50%)}
+
+@media(max-width:1000px){main{grid-template-columns:1fr}.feed{order:2}}
+@media(max-width:720px){
+  #app{grid-template-columns:1fr;grid-template-rows:64px auto 1fr;padding:10px;gap:10px}
+  nav{flex-direction:row;overflow-x:auto}
+  nav button{white-space:nowrap}
+  .stats{grid-template-columns:1fr}
+  .who b{display:none}
+  .login-card{padding:24px}
+  .pw-rules{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 64 64"><path d="M32 4l24 14v28L32 60 8 46V18z" fill="none" stroke="#f3bd57" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="6" fill="#f3bd57"/><path d="M21 45c0-7 5-11 11-11s11 4 11 11z" fill="#f3bd57"/><circle cx="21.5" cy="29" r="4" fill="#f3bd57" opacity=".85"/><circle cx="42.5" cy="29" r="4" fill="#f3bd57" opacity=".85"/></symbol></svg>
-<svg class="bg tl" viewBox="0 0 400 260" aria-hidden="true"><path d="M350 0C260 55 150 95 0 200V0Z" fill="#f3bd57"/><path d="M330 0C245 50 140 88 0 180V0Z" fill="#17372d"/></svg>
-<svg class="bg br" viewBox="0 0 400 260" aria-hidden="true"><path d="M350 0C260 55 150 95 0 200V0Z" fill="#f3bd57"/><path d="M330 0C245 50 140 88 0 180V0Z" fill="#17372d"/></svg>
+<canvas id="net" aria-hidden="true"></canvas>
 
 <!-- LOGIN / QEYDİYYAT -->
-<section id="login-screen" class="card">
-  <div class="head">
-    <svg class="logo"><use href="#logo"/></svg>
-    <div><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div>
-    <svg class="wave" viewBox="0 0 400 42" preserveAspectRatio="none"><path d="M0 22C110 50 270 40 400 2V42H0Z" fill="#f3bd57"/><path d="M0 30C110 58 270 48 400 12V42H0Z" fill="#fffefa"/></svg>
-  </div>
+<section id="login-screen">
+  <div class="login-card glass">
+    <div class="brand"><div class="logo">C</div><div><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div></div>
 
-  <div id="form-view">
-    <div class="tabs">
-      <button id="tab-login" type="button" class="active">Daxil ol</button>
-      <button id="tab-signup" type="button">Qeydiyyat</button>
-    </div>
-    <div class="pad">
-      <h2 id="auth-title">Xoş gəlmisiniz</h2>
-      <p id="auth-description" class="desc">Hesabınıza daxil olun və qrup çatı ilə davam edin.</p>
+    <div id="form-view">
+      <div class="seg">
+        <button id="tab-login" type="button" class="active">Daxil ol</button>
+        <button id="tab-signup" type="button">Qeydiyyat</button>
+      </div>
 
-      <form id="auth-form" class="form" novalidate>
-        <div class="inp"><i>✉</i><input id="email" type="email" autocomplete="email" required placeholder="E-poçt ünvanı"></div>
-        <div class="inp"><i>🔒</i><input id="password" type="password" autocomplete="current-password" required placeholder="Şifrə"><button id="password-toggle" type="button" class="password-toggle" aria-label="Şifrəni göstər/gizlət">Göstər</button></div>
-        <div id="confirm-field" class="inp hidden"><i>🔒</i><input id="password2" type="password" autocomplete="new-password" placeholder="Şifrəni təsdiqlə"></div>
+      <h1 id="auth-title">Xoş gəlmisiniz</h1>
+      <p id="auth-description" class="lead">Hesabınıza daxil olun və qrup çatı ilə davam edin.</p>
+
+      <form id="auth-form" novalidate>
+        <label for="email">E-poçt ünvanı</label>
+        <input class="field" id="email" type="email" autocomplete="email" required>
+
+        <label for="password">Şifrə</label>
+        <div class="pwwrap">
+          <input class="field" id="password" type="password" autocomplete="current-password" required>
+          <button id="password-toggle" type="button" class="pwtoggle" aria-label="Şifrəni göstər/gizlət">Göstər</button>
+        </div>
+
+        <div id="confirm-field" class="hidden">
+          <label for="password2">Şifrəni təsdiqlə</label>
+          <input class="field" id="password2" type="password" autocomplete="new-password">
+        </div>
+
         <ul id="pw-rules" class="pw-rules hidden">
           <li data-rule="len">Ən azı 8 simvol</li>
           <li data-rule="upper">1 böyük hərf</li>
@@ -125,59 +177,85 @@ h2{font:800 32px Manrope;letter-spacing:-.8px;margin:6px 0 6px;text-align:center
           <li data-rule="digit">1 rəqəm</li>
           <li data-rule="symbol">1 simvol</li>
         </ul>
-        <button id="auth-submit" class="btn" type="submit">Daxil ol</button>
+
+        <button id="auth-submit" class="btn primary block" type="submit">Daxil ol</button>
       </form>
 
       <div class="reg"><span id="register-text">Hesabınız yoxdur?</span><button id="auth-toggle" type="button">Hesab yarat</button></div>
     </div>
-  </div>
 
-  <div id="success-view" class="pad success hidden">
-    <div class="check">✓</div>
-    <h2>Qeydiyyatdan keçdiniz!</h2>
-    <h3>Admin təsdiqini gözləyin.</h3>
-    <p>Növbəti addımda dəvət kodunu yazın. Admin sorğunuzu təsdiqləyəndən sonra qrupa daxil ola biləcəksiniz.</p>
-    <p id="success-extra" class="hidden">E-poçt təsdiqi tələb olunursa, əvvəlcə poçtunuzu təsdiqləyin.</p>
-    <button id="go-home" type="button" class="btn soft">🏠 Əsas səhifə</button>
+    <div id="success-view" class="success hidden">
+      <div class="check">✓</div>
+      <h1>Qeydiyyatdan keçdiniz!</h1>
+      <h3>Admin təsdiqini gözləyin.</h3>
+      <p>Növbəti addımda dəvət kodunu yazın. Admin sorğunuzu təsdiqləyəndən sonra qrupa daxil ola biləcəksiniz.</p>
+      <p id="success-extra" class="hidden">E-poçt təsdiqi tələb olunursa, əvvəlcə poçtunuzu təsdiqləyin.</p>
+      <button id="go-home" type="button" class="btn">Əsas səhifə</button>
+    </div>
   </div>
 </section>
 
 <!-- QRUP ÇATI -->
-<section id="app" class="card hidden">
-  <div class="head">
-    <svg class="logo"><use href="#logo"/></svg>
-    <div><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div>
-    <div class="right">
-      <button id="signout" type="button" class="linkbtn">Çıxış</button>
+<div id="app" class="hidden">
+  <header class="glass">
+    <div class="brand"><div class="logo">C</div><div><b>Chatbot</b><small>Təhlükəsiz qrup çatı</small></div></div>
+    <div class="who">
       <span id="account-avatar" class="avatar">A</span>
+      <b id="account-label"></b>
+      <button class="btn sm" id="signout" type="button">Çıxış</button>
     </div>
-    <svg class="wave" viewBox="0 0 400 42" preserveAspectRatio="none"><path d="M0 22C110 50 270 40 400 2V42H0Z" fill="#f3bd57"/><path d="M0 30C110 58 270 48 400 12V42H0Z" fill="#fffefa"/></svg>
-  </div>
+  </header>
 
-  <div class="sub">
-    <div><h1>Qrup Çatı</h1><p>Təhlükəsiz söhbət mühiti</p></div>
-    <span class="ok">Təhlükəsiz</span>
-  </div>
-  <div class="hidden"><span id="account-label"></span><span id="room-name"></span><span id="room-info"></span></div>
+  <nav class="glass" role="tablist" aria-label="Bölmələr">
+    <button role="tab" data-tab="chat" aria-selected="true"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>Söhbət<span class="count" id="unread" hidden>0</span></button>
+    <button role="tab" data-tab="join" aria-selected="false"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c2.2.6 3.5 2.4 3.5 5.5"/></svg>Qrupa qoşul</button>
+  </nav>
 
-  <div class="row"><div class="pill"><label for="groups">Qrup</label><select id="groups"><option value="">Qrup seçin</option></select></div></div>
+  <main>
+    <div class="stats">
+      <div class="stat glass"><div class="ic" style="background:rgba(76,201,240,.15);color:var(--cyan)"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/></svg></div><div><strong id="st-groups">0</strong><span>Qrupum</span></div></div>
+      <div class="stat glass"><div class="ic" style="background:rgba(255,183,3,.15);color:var(--amber)"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></div><div><strong id="st-msgs">0</strong><span>Mesaj</span></div></div>
+      <div class="stat glass"><div class="ic" style="background:rgba(255,77,141,.15);color:var(--pink)"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><div><strong id="st-conn" class="off">Off</strong><span>Canlı kanal</span></div></div>
+    </div>
 
-  <form id="join-form" class="row join">
-    <div class="pill"><input id="invite" required placeholder="Dəvət kodu"></div>
-    <button class="btn" type="submit">Qoşul</button>
-  </form>
+    <section class="panel glass" id="tab-chat">
+      <div class="panel-head">
+        <div>
+          <h2>Qrup çatı: <span id="room-name">Qrup seçin</span></h2>
+          <p class="sub" id="room-info">Söhbətə qoşulmaq üçün qrup seçin.</p>
+        </div>
+        <span class="secure">Təhlükəsiz</span>
+      </div>
 
-  <div id="messages" class="messages"><div class="empty">Mesajları görmək üçün qrup seçin.</div></div>
+      <div class="row">
+        <select class="field" id="groups" aria-label="Qrup"><option value="">Qrup seçin</option></select>
+        <button class="btn" id="act-msgs" type="button">Yenilə</button>
+      </div>
 
-  <form id="message-form" class="composer">
-    <input id="message" maxlength="4000" autocomplete="off" placeholder="Mesaj yazın…">
-    <button class="send" type="submit" aria-label="Mesaj göndər">➤</button>
-  </form>
+      <div id="messages" class="chat"><div class="empty">Mesajları görmək üçün qrup seçin.</div></div>
 
-  <div class="enc">🔒 Qrup mesajları yalnız qrup üzvlərinə açıqdır.</div>
-</section>
+      <form id="message-form" class="row">
+        <input class="field" id="message" maxlength="4000" autocomplete="off" placeholder="Mesaj yazın..." required>
+        <button class="btn primary" type="submit" aria-label="Mesaj göndər">Göndər</button>
+      </form>
 
-<div id="toast" class="toast hidden"></div>
+      <div class="note">🔒 Qrup mesajları yalnız qrup üzvlərinə açıqdır.</div>
+    </section>
+
+    <section class="panel glass" id="tab-join" hidden>
+      <h2>Qrupa qoşul</h2>
+      <p class="sub">Admindən aldığınız dəvət kodunu yazın. Sorğu admin təsdiqindən sonra aktivləşir və qrup siyahıda görünür.</p>
+      <form id="join-form" class="row">
+        <input class="field" id="invite" required placeholder="Dəvət kodu" autocomplete="off">
+        <button class="btn primary" type="submit" style="white-space:nowrap">Qoşul</button>
+      </form>
+    </section>
+
+    <aside class="feed glass"><h2>Son fəaliyyət</h2><ul id="feed-list"></ul></aside>
+  </main>
+</div>
+
+<div id="toast" class="glass" role="status"></div>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -198,6 +276,177 @@ let membersChannel = null;
 let signup = false;
 let selectToken = 0;
 let pendingSuccess = false;
+let tab = 'chat';
+let unread = 0;
+
+/* ===== ARXA FON: canlı şəbəkə ===== */
+(function(){
+  const c = document.getElementById('net');
+  const x = c.getContext('2d');
+  const cols = ['76,201,240', '255,77,141', '255,183,3'];
+  const still = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const LINK = 170;      // eyni rəngli nöqtələr arasında əlaqə məsafəsi
+  const CROSS = 105;     // fərqli rənglər arasında zəif əlaqə
+  const MOUSE_R = 170;   // kursorun təsir radiusu
+  let W, H, P = [], pulses = [], ripples = [], t = 0, lastPulse = 0;
+  const mouse = { x: -9999, y: -9999 };
+
+  function size(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    c.width = W * dpr; c.height = H * dpr;
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.min(140, Math.floor(W * H / 11000));
+    P = Array.from({ length: n }, (_, i) => {
+      const bx = (Math.random() - .5) * .55, by = (Math.random() - .5) * .55;
+      return {
+        x: Math.random() * W, y: Math.random() * H,
+        bx, by, vx: bx, vy: by,
+        r: 1.3 + Math.random() * 1.8,
+        ph: Math.random() * 6.28,
+        sp: .0015 + Math.random() * .003,
+        c: cols[i % 3]
+      };
+    });
+    pulses = [];
+  }
+
+  /* yavaş dəyişən rəngli duman */
+  function aurora(){
+    const blobs = [
+      [cols[0], .5 + .30 * Math.sin(t * .00040), .35 + .20 * Math.cos(t * .00030)],
+      [cols[1], .5 + .35 * Math.cos(t * .00035), .70 + .15 * Math.sin(t * .00050)],
+      [cols[2], .5 + .30 * Math.sin(t * .00030 + 2), .50 + .30 * Math.cos(t * .00042 + 1)]
+    ];
+    const r = Math.max(W, H) * .42;
+    for(const [col, fx, fy] of blobs){
+      const bx = fx * W, by = fy * H;
+      const g = x.createRadialGradient(bx, by, 0, bx, by, r);
+      g.addColorStop(0, `rgba(${col},.085)`);
+      g.addColorStop(1, `rgba(${col},0)`);
+      x.fillStyle = g;
+      x.fillRect(0, 0, W, H);
+    }
+  }
+
+  /* əlaqə boyunca axan işıq impulsu */
+  function spawnPulse(){
+    const a = P[(Math.random() * P.length) | 0];
+    if(!a) return;
+    const near = P.filter(b => b !== a && b.c === a.c && Math.hypot(a.x - b.x, a.y - b.y) < LINK);
+    if(!near.length) return;
+    pulses.push({ a, b: near[(Math.random() * near.length) | 0], k: 0, sp: .010 + Math.random() * .014 });
+  }
+
+  function draw(ts){
+    t = ts || 0;
+    x.clearRect(0, 0, W, H);
+    aurora();
+
+    /* hərəkət */
+    for(const p of P){
+      p.ph += p.sp * 16;
+      // kursor: yaxın nöqtələr yumşaq cəlb olunur
+      const mdx = mouse.x - p.x, mdy = mouse.y - p.y, md = Math.hypot(mdx, mdy);
+      if(md < MOUSE_R && md > 1){
+        const f = (1 - md / MOUSE_R) * .035;
+        p.vx += mdx / md * f; p.vy += mdy / md * f;
+      }
+      // klik dalğası: nöqtələri itələyir
+      for(const rp of ripples){
+        const rdx = p.x - rp.x, rdy = p.y - rp.y, rd = Math.hypot(rdx, rdy);
+        if(Math.abs(rd - rp.r) < 26 && rd > 1){
+          p.vx += rdx / rd * .35 * rp.a; p.vy += rdy / rd * .35 * rp.a;
+        }
+      }
+      // əsas sürətə qayıt
+      p.vx += (p.bx - p.vx) * .02; p.vy += (p.by - p.vy) * .02;
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0 || p.x > W){ p.vx *= -1; p.bx *= -1; p.x = Math.max(0, Math.min(W, p.x)); }
+      if(p.y < 0 || p.y > H){ p.vy *= -1; p.by *= -1; p.y = Math.max(0, Math.min(H, p.y)); }
+    }
+
+    /* əlaqələr */
+    x.lineWidth = 1;
+    for(let i = 0; i < P.length; i++){
+      const a = P[i];
+      for(let j = i + 1; j < P.length; j++){
+        const b = P[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if(a.c === b.c){
+          if(d < LINK){
+            x.strokeStyle = `rgba(${a.c},${.30 * (1 - d / LINK)})`;
+            x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke();
+          }
+        }else if(d < CROSS){
+          x.strokeStyle = `rgba(200,215,255,${.09 * (1 - d / CROSS)})`;
+          x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke();
+        }
+      }
+    }
+
+    /* kursora uzanan xətlər */
+    for(const p of P){
+      const d = Math.hypot(mouse.x - p.x, mouse.y - p.y);
+      if(d < MOUSE_R){
+        x.strokeStyle = `rgba(${p.c},${.55 * (1 - d / MOUSE_R)})`;
+        x.beginPath(); x.moveTo(p.x, p.y); x.lineTo(mouse.x, mouse.y); x.stroke();
+      }
+    }
+
+    /* impulslar */
+    if(!still && t - lastPulse > 200 && pulses.length < 30){ lastPulse = t; spawnPulse(); }
+    for(let i = pulses.length - 1; i >= 0; i--){
+      const q = pulses[i];
+      q.k += q.sp;
+      if(q.k >= 1){ pulses.splice(i, 1); continue; }
+      const px = q.a.x + (q.b.x - q.a.x) * q.k, py = q.a.y + (q.b.y - q.a.y) * q.k;
+      const tk = Math.max(0, q.k - .12);
+      const tx = q.a.x + (q.b.x - q.a.x) * tk, ty = q.a.y + (q.b.y - q.a.y) * tk;
+      const fade = Math.sin(q.k * Math.PI);
+      x.strokeStyle = `rgba(${q.a.c},${.8 * fade})`;
+      x.lineWidth = 1.6;
+      x.beginPath(); x.moveTo(tx, ty); x.lineTo(px, py); x.stroke();
+      x.fillStyle = `rgba(${q.a.c},${.22 * fade})`;
+      x.beginPath(); x.arc(px, py, 7, 0, 7); x.fill();
+      x.fillStyle = `rgba(255,255,255,${.95 * fade})`;
+      x.beginPath(); x.arc(px, py, 1.8, 0, 7); x.fill();
+    }
+    x.lineWidth = 1;
+
+    /* klik dalğaları */
+    for(let i = ripples.length - 1; i >= 0; i--){
+      const rp = ripples[i];
+      rp.r += 5; rp.a -= .016;
+      if(rp.a <= 0){ ripples.splice(i, 1); continue; }
+      x.strokeStyle = `rgba(76,201,240,${.5 * rp.a})`;
+      x.beginPath(); x.arc(rp.x, rp.y, rp.r, 0, 7); x.stroke();
+    }
+
+    /* nöqtələr: parıltı + işıldama */
+    for(const p of P){
+      const tw = .65 + .35 * Math.sin(p.ph);
+      x.fillStyle = `rgba(${p.c},${.14 * tw})`;
+      x.beginPath(); x.arc(p.x, p.y, p.r * 4, 0, 7); x.fill();
+      x.fillStyle = `rgba(${p.c},${.55 + .45 * tw})`;
+      x.beginPath(); x.arc(p.x, p.y, p.r * (.85 + .3 * tw), 0, 7); x.fill();
+    }
+
+    if(!still) requestAnimationFrame(draw);
+  }
+
+  addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  document.addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
+  addEventListener('pointerdown', e => {
+    if(still) return;
+    ripples.push({ x: e.clientX, y: e.clientY, r: 4, a: 1 });
+    if(ripples.length > 6) ripples.shift();
+  });
+  addEventListener('resize', () => { size(); if(still) draw(0); });
+
+  size();
+  if(still) draw(0); else requestAnimationFrame(draw);
+})();
 
 /* ===== ŞİFRƏ QAYDASI (qeydiyyat üçün məcburi) ===== */
 const PW_RULES = {
@@ -221,9 +470,9 @@ function renderPwRules(){
 function toast(text){
   const el = $('#toast');
   el.textContent = text;
-  el.classList.remove('hidden');
+  el.classList.add('on');
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.classList.add('hidden'), 3500);
+  toast.timer = setTimeout(() => el.classList.remove('on'), 3500);
 }
 
 /* ===== SAFE HTML ===== */
@@ -231,6 +480,60 @@ function safe(value){
   return String(value ?? '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
+}
+
+/* ===== BÖLMƏLƏR (Söhbət / Qrupa qoşul) ===== */
+function showTab(name){
+  tab = name;
+  document.querySelectorAll('nav [role=tab]').forEach(b =>
+    b.setAttribute('aria-selected', b.dataset.tab === name));
+  ['chat', 'join'].forEach(n => { $('#tab-' + n).hidden = n !== name; });
+  if(name === 'chat'){
+    unread = 0;
+    $('#unread').hidden = true;
+    const box = $('#messages');
+    box.scrollTop = box.scrollHeight;
+  }
+}
+document.querySelectorAll('nav [role=tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+/* ===== SON FƏALİYYƏT LENTİ ===== */
+const FEED_LABELS = { sys:'Sistem', ok:'Üzvlük', warn:'Xəbərdarlıq', new:'Mesaj' };
+
+function feed(kind, text){
+  const list = $('#feed-list');
+  if(!list) return;
+
+  const li = document.createElement('li');
+  li.className = kind;
+  const dot = document.createElement('i');
+  const box = document.createElement('div');
+  const b = document.createElement('b');
+  b.textContent = text;
+  const s = document.createElement('small');
+  const time = new Date().toLocaleTimeString('az-AZ', { hour:'2-digit', minute:'2-digit' });
+  s.textContent = `${FEED_LABELS[kind] || 'Sistem'} · ${time}`;
+  box.append(b, s);
+  li.append(dot, box);
+  list.prepend(li);
+  while(list.children.length > 8) list.lastChild.remove();
+
+  if(kind === 'new' && tab !== 'chat'){
+    unread++;
+    const badge = $('#unread');
+    badge.textContent = unread > 9 ? '9+' : String(unread);
+    badge.hidden = false;
+  }
+}
+
+function updateStats(){
+  $('#st-msgs').textContent = document.querySelectorAll('#messages .msg').length;
+}
+
+function setConn(on){
+  const el = $('#st-conn');
+  el.textContent = on ? 'On' : 'Off';
+  el.classList.toggle('off', !on);
 }
 
 /* ===== RESET ROOM ===== */
@@ -242,6 +545,8 @@ function resetRoom(
   $('#room-name').textContent = title;
   $('#room-info').textContent = info;
   $('#messages').innerHTML = `<div class="empty">${safe(empty)}</div>`;
+  updateStats();
+  setConn(false);
 }
 
 /* ===== REALTIME DAYANDIR ===== */
@@ -266,7 +571,11 @@ function watchMembership(uid){
     .channel(`members-${uid}`)
     .on('postgres_changes',
       { event:'INSERT', schema:'public', table:'group_members', filter:`user_id=eq.${uid}` },
-      () => { loadGroups(); toast('Admin sorğunuzu təsdiqlədi. Qrup siyahıya əlavə olundu.'); })
+      () => {
+        loadGroups();
+        feed('ok', 'Admin sorğunuzu təsdiqlədi. Qrup siyahıya əlavə olundu.');
+        toast('Admin sorğunuzu təsdiqlədi. Qrup siyahıya əlavə olundu.');
+      })
     .subscribe();
 }
 
@@ -292,6 +601,8 @@ function showAuth(session){
   if(signed){
     $('#account-avatar').textContent = user.email?.[0]?.toUpperCase() || 'A';
     $('#account-label').textContent = user.email || '';
+    showTab('chat');
+    feed('sys', 'Təhlükəsiz kanal hazırdır.');
     loadGroups();
     watchMembership(newUid);
   }else{
@@ -300,6 +611,7 @@ function showAuth(session){
     selectToken++;
     stopRealtime();
     $('#groups').innerHTML = '<option value="">Qrup seçin</option>';
+    $('#st-groups').textContent = '0';
     resetRoom();
   }
 }
@@ -317,6 +629,9 @@ async function loadGroups(){
   select.innerHTML =
     '<option value="">Qrup seçin</option>' +
     (data || []).map(g => `<option value="${safe(g.id)}">${safe(g.name)}</option>`).join('');
+
+  $('#st-groups').textContent = (data || []).length;
+  feed('sys', `Qrup siyahısı yeniləndi: ${(data || []).length} qrup.`);
 
   if(activeGroup && data?.some(g => g.id === activeGroup.id)){
     select.value = activeGroup.id;
@@ -361,9 +676,15 @@ async function chooseGroup(id){
     .channel(`chat-${id}-${token}`)
     .on('postgres_changes',
       { event:'INSERT', schema:'public', table:'messages', filter:`group_id=eq.${id}` },
-      event => appendMessage(event.new))
-    .subscribe();
+      event => {
+        appendMessage(event.new);
+        if(event.new.user_id !== user?.id) feed('new', 'Qrupda yeni mesaj gəldi.');
+      })
+    .subscribe(status => {
+      if(token === selectToken) setConn(status === 'SUBSCRIBED');
+    });
 
+  feed('sys', `«${g.name}» qrupuna qoşuldunuz.`);
   await loadMessages(token);
 }
 
@@ -386,6 +707,7 @@ async function loadMessages(token){
   if(!data?.length){
     $('#messages').innerHTML =
       '<div class="empty">Bu qrupda hələ mesaj yoxdur. İlk mesajı siz yazın.</div>';
+    updateStats();
     return;
   }
 
@@ -403,27 +725,25 @@ function appendMessage(m){
 
   const own = m.user_id === user?.id;
   const row = document.createElement('div');
-  row.className = 'message' + (own ? ' mine' : '');
+  row.className = 'msg ' + (own ? 'me' : 'them');
   row.dataset.message = m.id;
 
-  row.innerHTML = `
-    <span class="avatar">${own ? 'S' : 'Ü'}</span>
-    <div class="bubble-wrap">
-      <div class="sender">${own ? 'Siz' : 'Qrup üzvü'}</div>
-      <div class="bubble"></div>
-    </div>`;
+  const who = document.createElement('small');
+  who.textContent = own ? 'Siz' : 'Qrup üzvü';
 
-  const bubble = row.querySelector('.bubble');
-  bubble.textContent = m.body;
+  const text = document.createElement('span');
+  text.textContent = m.body;
 
-  const time = document.createElement('span');
-  time.className = 'msg-time';
+  const time = document.createElement('small');
+  time.className = 't';
   time.textContent = new Date(m.created_at).toLocaleTimeString('az-AZ', { hour:'2-digit', minute:'2-digit' });
-  bubble.append(time);
+
+  row.append(who, text, time);
 
   const box = $('#messages');
   box.append(row);
   box.scrollTop = box.scrollHeight;
+  updateStats();
 }
 
 /* ===== SUPABASE ===== */
@@ -525,6 +845,13 @@ if(!configured){
   /* --- Qrup seçimi --- */
   $('#groups').onchange = e => chooseGroup(e.target.value);
 
+  /* --- Yenilə --- */
+  $('#act-msgs').onclick = async () => {
+    await loadGroups();
+    if(activeGroup) await chooseGroup(activeGroup.id);
+    toast('Yeniləndi.');
+  };
+
   /* --- Qrupa qoşul --- */
   $('#join-form').onsubmit = async e => {
     e.preventDefault();
@@ -542,11 +869,15 @@ if(!configured){
       await loadGroups();
       $('#groups').value = data.group_id;
       await chooseGroup(data.group_id);
+      showTab('chat');
+      feed('ok', 'Qrupa uğurla qoşuldunuz.');
       return toast('Qrupa qoşuldunuz.');
     }
     if(data?.status === 'pending'){
+      feed('warn', 'Sorğu adminə göndərildi, təsdiq gözlənilir.');
       return toast('Sorğu adminə göndərildi. Təsdiqdən sonra qrup siyahıda görünəcək.');
     }
+    feed('warn', 'Yanlış dəvət kodu cəhdi.');
     toast('Dəvət kodu tapılmadı.');
   };
 
