@@ -752,7 +752,10 @@ if(!configured){
   $('#auth-submit').disabled = true;
   toast('Supabase konfiqurasiyasını yoxlayın.');
 }else{
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // İstifadəçi girişi admin panelindən AYRI saxlanır — bir-birinə qarışmır
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { storageKey: 'chatbot-user-auth' }
+  });
 
   /* --- Qeydiyyat / giriş keçidi --- */
   $('#password').addEventListener('input', renderPwRules);
