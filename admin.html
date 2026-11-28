@@ -122,6 +122,8 @@ main.wide .feed{display:none}
 .req-info small{color:var(--muted);font-size:12px}
 .req-info small em{font-style:normal;color:var(--cyan)}
 .req .actions{display:flex;gap:8px}
+.subh{font-size:14px;font-weight:600;margin:4px 0 12px;display:flex;gap:8px;align-items:center}
+.subh span{font:500 12px 'JetBrains Mono',monospace;color:var(--amber)}
 
 /* ===== Mesajlar ===== */
 .msgwrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:14px;height:560px}
@@ -233,7 +235,10 @@ main.wide .feed{display:none}
     <!-- SORĞULAR -->
     <section class="panel glass" id="tab-requests" hidden>
       <h2>Qoşulma sorğuları</h2>
-      <p class="sub">Admin təsdiqi olmadan heç kim qrupa daxil ola bilməz.</p>
+      <p class="sub">Admin təsdiqi olmadan heç kim sistemə və qrupa daxil ola bilməz.</p>
+      <h3 class="subh">Yeni hesablar <span id="accN"></span></h3>
+      <div class="reqs" id="accList"></div>
+      <h3 class="subh" style="margin-top:26px">Qrupa qoşulma</h3>
       <div class="toolbar" style="margin-top:0">
         <div class="chips" id="reqChips"></div>
         <button class="btn sm primary" id="approveAll" hidden>Hamısını təsdiqlə</button>
@@ -313,6 +318,18 @@ const api={
     return data.session.user;
   },
   async logout(){ if(sb)await sb.auth.signOut(); },
+  /* hesab təsdiqi — real Supabase (account_approvals cədvəli) */
+  async listAccounts(){
+    if(!sb)return [];
+    const {data,error}=await sb.from('account_approvals').select('user_id,email,created_at').eq('status','pending').order('created_at',{ascending:false});
+    if(error){console.error(error);toast('Hesablar yüklənmədi: '+error.message);return [];}
+    return data||[];
+  },
+  async resolveAccount(uid,ok,email){
+    const {error}=await sb.from('account_approvals').update({status:ok?'approved':'rejected',decided_at:new Date().toISOString()}).eq('user_id',uid);
+    if(error)throw error;
+    log(`${email} hesabı ${ok?'təsdiqləndi':'rədd edildi'}`,ok?'ok':'pink');
+  },
   async listGroups(){ return db.groups; },
   async createGroup(name){
     const g={id:uid(),name,code:rand(),members:[],threat:false,created:now()};
@@ -401,9 +418,10 @@ document.querySelectorAll('nav [role=tab]').forEach(b=>b.onclick=()=>showTab(b.d
 /* ===== statistika ===== */
 function renderStats(){
   $('#sGroups').textContent=db.groups.length;
-  $('#sReq').textContent=db.requests.length;
+  const pend=db.requests.length+accCount;
+  $('#sReq').textContent=pend;
   $('#sMsg').textContent=Object.values(db.messages).reduce((a,b)=>a+b.length,0);
-  const c=$('#reqCount');c.hidden=!db.requests.length;c.textContent=db.requests.length;
+  const c=$('#reqCount');c.hidden=!pend;c.textContent=pend;
 }
 
 /* ===== QRUPLAR ===== */
@@ -449,6 +467,34 @@ $('#groupList').addEventListener('click',async e=>{
   if(d.del){if(!confirm('Bu qrup və bütün mesajları silinsin?'))return;await api.deleteGroup(d.del);toast('Qrup silindi');}
   renderAll();
 });
+
+/* ===== HESAB TƏSDİQİ ===== */
+let accCount=0, accChannel=null;
+async function renderAccounts(){
+  const list=await api.listAccounts();
+  accCount=list.length;
+  $('#accN').textContent=list.length?`· ${list.length}`:'';
+  $('#accList').innerHTML=list.length?list.map(a=>`
+    <article class="req">${av(a.email||'?','lg')}
+      <div class="req-info"><b>${esc(a.email||'(email yoxdur)')}</b><small>Qeydiyyatdan keçib, təsdiq gözləyir · ${ago(new Date(a.created_at).getTime())}</small></div>
+      <div class="actions"><button class="btn sm primary" data-aok="${a.user_id}" data-em="${esc(a.email||'')}">${I.check}Təsdiqlə</button><button class="btn sm danger" data-ano="${a.user_id}" data-em="${esc(a.email||'')}">${I.x}Rədd et</button></div>
+    </article>`).join('')
+    :`<div class="empty">${I.users}Təsdiq gözləyən yeni hesab yoxdur.</div>`;
+  renderStats();
+}
+$('#accList').addEventListener('click',async e=>{
+  const t=e.target.closest('button');if(!t)return;
+  const ok=!!t.dataset.aok;
+  try{await api.resolveAccount(t.dataset.aok||t.dataset.ano,ok,t.dataset.em);toast(ok?'Hesab təsdiqləndi':'Hesab rədd edildi');}
+  catch(x){console.error(x);toast('Alınmadı: '+x.message);}
+  renderAccounts();
+});
+function watchAccounts(){
+  if(!sb||accChannel)return;
+  accChannel=sb.channel('admin-approvals')
+    .on('postgres_changes',{event:'*',schema:'public',table:'account_approvals'},()=>renderAccounts())
+    .subscribe();
+}
 
 /* ===== SORĞULAR ===== */
 async function renderReq(){
@@ -509,7 +555,7 @@ function renderFeed(){
   const c={cyan:'var(--cyan)',pink:'var(--pink)',amber:'var(--amber)',ok:'var(--ok)'};
   $('#feedList').innerHTML=db.feed.slice(0,8).map(f=>`<li><i style="background:${c[f.c]||c.cyan};box-shadow:0 0 10px ${c[f.c]||c.cyan}"></i><div><b>${esc(f.t)}</b><small>${ago(f.time||now())}</small></div></li>`).join('');
 }
-async function renderAll(){await renderGroups();await renderReq();await renderChat();renderFeed();renderStats();}
+async function renderAll(){await renderGroups();await renderReq();await renderChat();renderFeed();renderStats();await renderAccounts();watchAccounts();}
 
 /* ===== arxa fon: hərəkətli şəbəkə ===== */
 (function(){
