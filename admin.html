@@ -267,34 +267,13 @@ main.wide .feed{display:none}
 /* ===== Məlumat qatı (DEMO) =====
    Məlumatlar hələlik brauzerdə saxlanır. Supabase-ə bağlamaq üçün
    yalnız "api" obyektinin funksiyalarını dəyişin — interfeys eyni qalır. */
-const KEY='chatbot_admin_demo';
+const KEY='chatbot_admin_v2';
 const now=()=>Date.now();
 const uid=()=>(crypto.randomUUID?crypto.randomUUID():now().toString(36)+Math.random().toString(36).slice(2));
 const rand=()=>[...crypto.getRandomValues(new Uint8Array(4))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
 
-function seed(){
-  const g1=uid(),g2=uid(),t=now();
-  return {
-    groups:[
-      {id:g1,name:'160 HTML qrupu',code:rand(),members:['Aysel','Murad','Leyla'],threat:false,created:t},
-      {id:g2,name:'Layihə komandası',code:rand(),members:['Nicat','Səbinə'],threat:false,created:t}
-    ],
-    requests:[
-      {id:uid(),user:'Rauf',groupId:g1,time:t-4*60e3},
-      {id:uid(),user:'Günay',groupId:g2,time:t-25*60e3},
-      {id:uid(),user:'Elvin',groupId:g1,time:t-2*3600e3}
-    ],
-    messages:{
-      [g1]:[
-        {who:'Aysel',text:'Salam, hamı buradadır?',time:t-50*60e3},
-        {who:'Murad',text:'Bəli, buradayam 👋',time:t-48*60e3},
-        {who:'Admin',me:true,text:'Xoş gəlmisiniz!',time:t-40*60e3}
-      ],
-      [g2]:[]
-    },
-    feed:[{t:'Panel işə salındı',c:'cyan',time:t}]
-  };
-}
+function seed(){ return {groups:[],requests:[],messages:{},feed:[]}; }
+try{localStorage.removeItem('chatbot_admin_demo');}catch(e){}
 let db=null;
 try{db=JSON.parse(localStorage.getItem(KEY));}catch(e){}
 if(!db||!Array.isArray(db.groups))db=seed();
@@ -489,6 +468,7 @@ $('#sendForm').addEventListener('submit',async e=>{
 
 /* ===== fəaliyyət ===== */
 function renderFeed(){
+  if(!db.feed.length){$('#feedList').innerHTML='<li>Hələ fəaliyyət yoxdur.</li>';return;}
   const c={cyan:'var(--cyan)',pink:'var(--pink)',amber:'var(--amber)',ok:'var(--ok)'};
   $('#feedList').innerHTML=db.feed.slice(0,8).map(f=>`<li><i style="background:${c[f.c]||c.cyan};box-shadow:0 0 10px ${c[f.c]||c.cyan}"></i><div><b>${esc(f.t)}</b><small>${ago(f.time||now())}</small></div></li>`).join('');
 }
