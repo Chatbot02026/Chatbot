@@ -20,18 +20,22 @@ body{background:var(--bg);color:var(--text);font:400 15px/1.5 Sora,system-ui,san
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.btn{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:9px 16px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s,border-color .15s}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:9px 16px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s,border-color .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .btn:hover{background:rgba(255,255,255,.09)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.primary{background:rgba(76,201,240,.14);border-color:rgba(76,201,240,.55);color:var(--cyan)}
 .btn.primary:hover{background:rgba(76,201,240,.25)}
 .btn.danger{background:rgba(255,77,141,.1);border-color:rgba(255,77,141,.5);color:var(--pink)}
 .btn.danger:hover{background:rgba(255,77,141,.2)}
+.btn.warn{background:rgba(255,183,3,.08);border-color:rgba(255,183,3,.45);color:var(--amber)}
+.btn.warn:hover{background:rgba(255,183,3,.18)}
 .btn.sm{padding:6px 12px;font-size:13px}
 .field{width:100%;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--line);background:rgba(5,7,13,.6)}
 .field:focus{border-color:var(--cyan);outline:none}
-svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;flex:none}
+svg.i.s{width:15px;height:15px}
 
-/* login */
+/* giriş */
 #login{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px}
 .login-card{width:min(400px,100%);padding:32px;border-radius:var(--r-lg)}
 .brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}
@@ -43,7 +47,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .login-card .btn{width:100%;margin-top:22px;padding:12px}
 #err{color:var(--pink);font-size:13px;min-height:20px;margin-top:12px}
 
-/* shell */
+/* çərçivə */
 #app{position:relative;z-index:1;display:none;min-height:100%;grid-template-columns:230px 1fr;grid-template-rows:64px 1fr;gap:16px;padding:16px}
 #app.on{display:grid}
 header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-radius:var(--r-lg)}
@@ -56,33 +60,103 @@ nav button:hover{background:rgba(255,255,255,.05);color:var(--text)}
 nav button[aria-selected=true]{background:rgba(76,201,240,.14);color:var(--cyan);box-shadow:inset 3px 0 0 var(--cyan)}
 nav .count{margin-left:auto;font:500 12px 'JetBrains Mono',monospace;background:var(--pink);color:#05070d;border-radius:99px;padding:1px 8px}
 main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-content:start}
+main.wide{grid-template-columns:minmax(0,1fr)}
+main.wide .feed{display:none}
 .stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .stat{padding:18px 20px;border-radius:var(--r-lg);display:flex;align-items:center;gap:16px}
 .stat .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center}
 .stat strong{font-size:28px;line-height:1;display:block}
 .stat span{color:var(--muted);font-size:13px}
-.panel{padding:24px;border-radius:var(--r-lg)}
+.panel{padding:24px;border-radius:var(--r-lg);min-width:0}
 .panel h2{font-size:18px;margin-bottom:4px}
 .panel .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
 .row{display:flex;gap:10px}
-.cards{display:grid;gap:12px;margin-top:20px}
-.node{padding:16px 18px;border-radius:var(--r-md);border:1px solid var(--line);background:rgba(5,7,13,.45);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.node h3{font-size:16px;margin-bottom:2px}
-.node .id{font:500 11px 'JetBrains Mono',monospace;color:var(--muted)}
-.code{font:500 13px 'JetBrains Mono',monospace;color:var(--amber);background:rgba(255,183,3,.1);border:1px solid rgba(255,183,3,.35);padding:5px 10px;border-radius:var(--r-sm);cursor:pointer}
-.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:28px;text-align:center;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:32px 20px;text-align:center;color:var(--muted);display:grid;justify-items:center;gap:10px}
+.empty svg.i{width:28px;height:28px;opacity:.6}
+
+/* avatar */
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:#05070d;flex:none}
+.av.lg{width:42px;height:42px;font-size:16px}
+.avs{display:flex;align-items:center}
+.avs .av{margin-left:-8px;border:2px solid #0d1424}
+.avs .av:first-child{margin-left:0}
+.avs .more{margin-left:8px;font-size:12px;color:var(--muted)}
+
+/* ===== Qruplar ===== */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:24px 0 14px}
+.toolbar h3{font-size:14px;font-weight:500;color:var(--muted)}
+.search{position:relative;width:min(260px,100%)}
+.search .field{padding:9px 12px 9px 36px;font-size:14px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.gcard{position:relative;overflow:hidden;padding:20px 18px 18px;border-radius:var(--r-md);border:1px solid var(--line);background:rgba(5,7,13,.5);display:flex;flex-direction:column;gap:14px;transition:border-color .15s,transform .15s}
+.gcard:hover{border-color:rgba(76,201,240,.4);transform:translateY(-2px)}
+.gcard::before{content:'';position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,var(--cyan),var(--pink))}
+.gcard.threat{border-color:rgba(255,77,141,.45)}
+.gcard.threat::before{background:var(--pink)}
+.gtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.gtop h3{font-size:16px;font-weight:600;word-break:break-word}
+.meta{display:flex;gap:14px;color:var(--muted);font-size:12px;margin-top:4px}
+.meta span{display:inline-flex;gap:5px;align-items:center}
+.tag{font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid;white-space:nowrap}
+.tag.red{color:var(--pink);border-color:rgba(255,77,141,.5);background:rgba(255,77,141,.08)}
+.tag.green{color:var(--ok);border-color:rgba(61,220,151,.45);background:rgba(61,220,151,.08)}
+.nomem{font-size:12px;color:var(--muted)}
+.codebox{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:var(--r-sm);background:rgba(255,183,3,.07);border:1px dashed rgba(255,183,3,.4)}
+.codebox small{display:block;font-size:11px;color:var(--muted)}
+.codebox span{font:500 15px 'JetBrains Mono',monospace;color:var(--amber);letter-spacing:.08em}
+.iconbtn{border:0;background:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px;display:grid;place-items:center}
+.iconbtn:hover{color:var(--text);background:rgba(255,255,255,.07)}
+.gactions{display:flex;gap:6px;flex-wrap:wrap}
+.gactions .btn{flex:1 1 auto}
+
+/* ===== Sorğular ===== */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 13px;border-radius:99px;border:1px solid var(--line);background:none;cursor:pointer;font-size:13px;color:var(--muted);transition:.15s}
+.chip:hover{color:var(--text)}
+.chip[aria-pressed=true]{color:var(--cyan);border-color:rgba(76,201,240,.55);background:rgba(76,201,240,.12)}
+.reqs{display:grid;gap:10px}
+.req{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r-md);border:1px solid var(--line);background:rgba(5,7,13,.5);flex-wrap:wrap}
+.req-info{flex:1;min-width:160px}
+.req-info b{display:block;font-weight:500}
+.req-info small{color:var(--muted);font-size:12px}
+.req-info small em{font-style:normal;color:var(--cyan)}
+.req .actions{display:flex;gap:8px}
+
+/* ===== Mesajlar ===== */
+.msgwrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:14px;height:560px}
+.glist{overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px}
+.gitem{text-align:left;border:1px solid transparent;background:rgba(5,7,13,.5);border-radius:var(--r-md);padding:11px 12px;cursor:pointer;display:flex;gap:10px;align-items:center;transition:.15s}
+.gitem:hover{border-color:var(--line)}
+.gitem[aria-selected=true]{border-color:rgba(76,201,240,.55);background:rgba(76,201,240,.1)}
+.gitem .t{flex:1;min-width:0}
+.gitem b,.gitem small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gitem b{font-weight:500;font-size:14px}
+.gitem small{color:var(--muted);font-size:12px}
+.gitem .n{font:500 11px 'JetBrains Mono',monospace;color:var(--muted)}
+.chatbox{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-md);background:rgba(5,7,13,.5);min-height:0;overflow:hidden}
+.chathead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.chathead .l{display:flex;gap:10px;align-items:center;min-width:0}
+.chathead b{display:block;font-weight:600}
+.chathead small{color:var(--muted);font-size:12px}
+.chathead .code{font:500 12px 'JetBrains Mono',monospace;color:var(--amber)}
+.chat{flex:1;overflow:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:75%;padding:9px 13px 7px;border-radius:14px;font-size:14px;word-wrap:break-word}
+.msg.me{align-self:flex-end;background:rgba(76,201,240,.16);border:1px solid rgba(76,201,240,.4);border-bottom-right-radius:4px}
+.msg.them{align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg .who{display:block;font-size:11px;font-weight:600;margin-bottom:2px}
+.msg time{display:block;text-align:right;font-size:10px;color:var(--muted);margin-top:3px}
+.composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.composer .field{padding:10px 14px}
+
+/* fəaliyyət */
 .feed{padding:20px;border-radius:var(--r-lg);align-self:start}
 .feed h2{font-size:15px;margin-bottom:14px}
 .feed ul{list-style:none;padding:0;display:grid;gap:14px}
 .feed li{display:flex;gap:10px;font-size:13px;color:var(--muted)}
-.feed li i{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
-.feed li b{color:var(--text);font-weight:500}
-.chat{display:grid;gap:10px;height:300px;overflow:auto;padding:14px;border:1px solid var(--line);border-radius:var(--r-md);background:rgba(5,7,13,.45);align-content:start;margin:14px 0}
-.msg{max-width:78%;padding:9px 13px;border-radius:14px;font-size:14px}
-.msg.me{justify-self:end;background:rgba(76,201,240,.18);border:1px solid rgba(76,201,240,.4)}
-.msg.them{background:rgba(255,255,255,.06);border:1px solid var(--line)}
-.msg small{display:block;color:var(--muted);font-size:11px}
+.feed li i{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none}
+.feed li b{color:var(--text);font-weight:500;display:block}
+.feed li small{font-size:11px}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;z-index:30;padding:10px 18px;border-radius:var(--r-md);transition:.25s;pointer-events:none}
 #toast.on{opacity:1;transform:translateX(-50%)}
 [hidden]{display:none!important}
@@ -94,6 +168,13 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
   nav button{white-space:nowrap}
   .stats{grid-template-columns:1fr}
   .who b{display:none}
+  .panel{padding:18px}
+  .row{flex-wrap:wrap}
+  .msgwrap{grid-template-columns:1fr;height:auto}
+  .glist{flex-direction:row;overflow-x:auto}
+  .gitem{min-width:190px}
+  .chatbox{height:480px}
+  .msg{max-width:88%}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -127,35 +208,54 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
     <button role="tab" data-tab="messages" aria-selected="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>Mesajlar</button>
   </nav>
 
-  <main>
+  <main id="main">
     <div class="stats">
       <div class="stat glass"><div class="ic" style="background:rgba(76,201,240,.15);color:var(--cyan)"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/></svg></div><div><strong id="sGroups">0</strong><span>Aktiv qrup</span></div></div>
       <div class="stat glass"><div class="ic" style="background:rgba(255,77,141,.15);color:var(--pink)"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6c0 5-2 6-2 7h16c0-1-2-2-2-7a6 6 0 0 0-6-6zM10 20a2 2 0 0 0 4 0"/></svg></div><div><strong id="sReq">0</strong><span>Gözləyən sorğu</span></div></div>
       <div class="stat glass"><div class="ic" style="background:rgba(255,183,3,.15);color:var(--amber)"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></div><div><strong id="sMsg">0</strong><span>Ümumi mesaj</span></div></div>
     </div>
 
+    <!-- QRUPLAR -->
     <section class="panel glass" id="tab-groups">
       <h2>Yeni qrup yarat</h2>
-      <p class="sub">Qrup yaradın və sistem avtomatik giriş kodu versin.</p>
+      <p class="sub">Qrupa ad verin — sistem avtomatik giriş kodu yaradacaq.</p>
       <form class="row" id="newGroup">
-        <input class="field" id="gname" placeholder="Məsələn: 160 HTML qrupu" required>
-        <button class="btn primary" type="submit" style="white-space:nowrap">Qrup yarat</button>
+        <input class="field" id="gname" placeholder="Məsələn: 160 HTML qrupu" maxlength="60" required>
+        <button class="btn primary" type="submit"><svg class="i s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Qrup yarat</button>
       </form>
-      <div class="cards" id="groupList"></div>
+      <div class="toolbar">
+        <h3 id="gTitle">Bütün qruplar</h3>
+        <label class="search"><svg class="i s" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="field" id="gsearch" placeholder="Qrup axtar..." aria-label="Qrup axtar"></label>
+      </div>
+      <div class="grid" id="groupList"></div>
     </section>
 
+    <!-- SORĞULAR -->
     <section class="panel glass" id="tab-requests" hidden>
       <h2>Qoşulma sorğuları</h2>
-      <p class="sub">İstifadəçilərin qrupa qoşulma istəklərini təsdiqləyin və ya rədd edin.</p>
-      <div class="cards" id="reqList"></div>
+      <p class="sub">Admin təsdiqi olmadan heç kim qrupa daxil ola bilməz.</p>
+      <div class="toolbar" style="margin-top:0">
+        <div class="chips" id="reqChips"></div>
+        <button class="btn sm primary" id="approveAll" hidden>Hamısını təsdiqlə</button>
+      </div>
+      <div class="reqs" id="reqList"></div>
     </section>
 
+    <!-- MESAJLAR -->
     <section class="panel glass" id="tab-messages" hidden>
       <h2>Qrup mesajları</h2>
-      <p class="sub">Qrup seçin, mesajları oxuyun və admin kimi mesaj yazın.</p>
-      <div class="row"><select class="field" id="msgGroup"></select><button class="btn" id="refresh">Yenilə</button></div>
-      <div class="chat" id="chat"></div>
-      <form class="row" id="sendForm"><input class="field" id="msgText" placeholder="Mesaj yazın..." required><button class="btn primary" type="submit">Göndər</button></form>
+      <p class="sub">Soldan qrup seçin, yazışmanı oxuyun və admin kimi cavab yazın.</p>
+      <div class="msgwrap">
+        <div class="glist" id="glist" role="listbox" aria-label="Qruplar"></div>
+        <div class="chatbox">
+          <div class="chathead" id="chathead"></div>
+          <div class="chat" id="chat"></div>
+          <form class="composer" id="sendForm">
+            <input class="field" id="msgText" placeholder="Mesaj yazın..." autocomplete="off" required>
+            <button class="btn primary" type="submit" aria-label="Göndər"><svg class="i" viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7z"/></svg></button>
+          </form>
+        </div>
+      </div>
     </section>
 
     <aside class="feed glass"><h2>Son fəaliyyət</h2><ul id="feedList"></ul></aside>
@@ -164,94 +264,237 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
 <div id="toast" class="glass" role="status"></div>
 
 <script>
-/* ===== Məlumat qatı =====
-   Hazırda DEMO məlumatdır. Öz Supabase kodunuzu yalnız bu obyektin
-   funksiyalarına bağlayın — qalan interfeys dəyişməz qalır. */
-const api = {
-  async login(email,pass){ /* TODO: supabase.auth.signInWithPassword({email,password:pass}) */ return {email}; },
-  async logout(){ /* TODO: supabase.auth.signOut() */ },
-  async listGroups(){ return db.groups; },            // TODO: supabase.from('...').select()
-  async createGroup(name){ const g={id:crypto.randomUUID(),name,code:rand()}; db.groups.unshift(g); db.messages[g.id]=[]; log(`«${name}» qrupu yaradıldı`); return g; },
-  async changeCode(id){ const g=db.groups.find(x=>x.id===id); g.code=rand(); return g; },
-  async deleteGroup(id){ db.groups=db.groups.filter(x=>x.id!==id); },
+/* ===== Məlumat qatı (DEMO) =====
+   Məlumatlar hələlik brauzerdə saxlanır. Supabase-ə bağlamaq üçün
+   yalnız "api" obyektinin funksiyalarını dəyişin — interfeys eyni qalır. */
+const KEY='chatbot_admin_demo';
+const now=()=>Date.now();
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():now().toString(36)+Math.random().toString(36).slice(2));
+const rand=()=>[...crypto.getRandomValues(new Uint8Array(4))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+
+function seed(){
+  const g1=uid(),g2=uid(),t=now();
+  return {
+    groups:[
+      {id:g1,name:'160 HTML qrupu',code:rand(),members:['Aysel','Murad','Leyla'],threat:false,created:t},
+      {id:g2,name:'Layihə komandası',code:rand(),members:['Nicat','Səbinə'],threat:false,created:t}
+    ],
+    requests:[
+      {id:uid(),user:'Rauf',groupId:g1,time:t-4*60e3},
+      {id:uid(),user:'Günay',groupId:g2,time:t-25*60e3},
+      {id:uid(),user:'Elvin',groupId:g1,time:t-2*3600e3}
+    ],
+    messages:{
+      [g1]:[
+        {who:'Aysel',text:'Salam, hamı buradadır?',time:t-50*60e3},
+        {who:'Murad',text:'Bəli, buradayam 👋',time:t-48*60e3},
+        {who:'Admin',me:true,text:'Xoş gəlmisiniz!',time:t-40*60e3}
+      ],
+      [g2]:[]
+    },
+    feed:[{t:'Panel işə salındı',c:'cyan',time:t}]
+  };
+}
+let db=null;
+try{db=JSON.parse(localStorage.getItem(KEY));}catch(e){}
+if(!db||!Array.isArray(db.groups))db=seed();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){}};
+const findG=id=>db.groups.find(g=>g.id===id);
+function log(t,c='cyan'){db.feed.unshift({t,c,time:now()});db.feed=db.feed.slice(0,30);save();renderFeed();}
+
+const api={
+  async login(email,pass){ if(!email||!pass)throw new Error('empty'); return {email}; },  // TODO: supabase.auth.signInWithPassword
+  async logout(){},                                                                        // TODO: supabase.auth.signOut
+  async listGroups(){ return db.groups; },
+  async createGroup(name){
+    const g={id:uid(),name,code:rand(),members:[],threat:false,created:now()};
+    db.groups.unshift(g); db.messages[g.id]=[]; save(); log(`«${name}» qrupu yaradıldı`,'cyan'); return g;
+  },
+  async changeCode(id){ const g=findG(id); g.code=rand(); save(); log(`«${g.name}» qrupunun kodu dəyişdirildi`,'amber'); return g; },
+  async markThreat(id){
+    const g=findG(id), before=[...g.members];
+    g.code=rand(); g.threat=true; save();
+    log(`Təhlükə: «${g.name}». Təhlükədən əvvəl qrupda olanlar: ${before.join(', ')||'heç kim'}`,'pink');
+    return before;
+  },
+  async clearThreat(id){ const g=findG(id); g.threat=false; save(); log(`«${g.name}» təhlükəsiz kimi işarələndi`,'ok'); },
+  async deleteGroup(id){
+    const g=findG(id);
+    db.groups=db.groups.filter(x=>x.id!==id); delete db.messages[id];
+    db.requests=db.requests.filter(r=>r.groupId!==id); save(); log(`«${g.name}» qrupu silindi`,'pink');
+  },
   async listRequests(){ return db.requests; },
-  async resolveRequest(id,ok){ const r=db.requests.find(x=>x.id===id); db.requests=db.requests.filter(x=>x.id!==id); log(`${r.user} sorğusu ${ok?'təsdiqləndi':'rədd edildi'}`); },
+  async resolveRequest(id,ok){
+    const r=db.requests.find(x=>x.id===id); if(!r)return;
+    db.requests=db.requests.filter(x=>x.id!==id);
+    const g=findG(r.groupId);
+    if(ok&&g&&!g.members.includes(r.user))g.members.push(r.user);
+    save(); log(`${r.user} → «${g?g.name:'?'}» ${ok?'təsdiqləndi':'rədd edildi'}`,ok?'ok':'pink');
+  },
   async listMessages(gid){ return db.messages[gid]||[]; },
-  async sendMessage(gid,text){ (db.messages[gid]=db.messages[gid]||[]).push({me:true,who:'Admin',text}); }
+  async sendMessage(gid,text){ (db.messages[gid]=db.messages[gid]||[]).push({who:'Admin',me:true,text,time:now()}); save(); }
 };
-const rand=()=>[...crypto.getRandomValues(new Uint8Array(6))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
-const log=t=>{db.feed.unshift({t});renderFeed();};
 
+/* ===== köməkçilər ===== */
 const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const COLS=['var(--cyan)','var(--pink)','var(--amber)','var(--ok)'];
+const colorOf=n=>COLS[[...String(n)].reduce((a,c)=>a+c.charCodeAt(0),0)%COLS.length];
+const av=(n,cls='')=>`<span class="av ${cls}" style="background:${colorOf(n)}" title="${esc(n)}">${esc((String(n)[0]||'?').toUpperCase())}</span>`;
+function ago(ts){const s=Math.floor((now()-ts)/1000);
+  if(s<60)return 'indicə'; if(s<3600)return Math.floor(s/60)+' dəq əvvəl';
+  if(s<86400)return Math.floor(s/3600)+' saat əvvəl'; return Math.floor(s/86400)+' gün əvvəl';}
+const hm=ts=>new Date(ts).toLocaleTimeString('az',{hour:'2-digit',minute:'2-digit'});
+const I={
+  users:'<svg class="i s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/></svg>',
+  msg:'<svg class="i s" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+  copy:'<svg class="i s" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>',
+  key:'<svg class="i s" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/></svg>',
+  shield:'<svg class="i s" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="M12 9v4M12 16h.01"/></svg>',
+  trash:'<svg class="i s" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
+  check:'<svg class="i s" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg>',
+  x:'<svg class="i s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  bell:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6c0 5-2 6-2 7h16c0-1-2-2-2-7a6 6 0 0 0-6-6zM10 20a2 2 0 0 0 4 0"/></svg>',
+  grp:'<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7"/></svg>'
+};
 let toastT;
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2200);}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2400);}
 
-/* giriş */
+let query='', reqFilter='all', curGroup=null;
+
+/* ===== giriş ===== */
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();$('#err').textContent='';
-  try{const u=await api.login($('#em').value.trim(),$('#pw').value);
-    $('#who').textContent=u.email;$('#login').hidden=true;$('#app').classList.add('on');renderAll();
-  }catch(x){$('#err').textContent='E-poçt və ya şifrə yanlışdır. Yenidən yoxlayın.';}
+  let u;
+  try{u=await api.login($('#em').value.trim(),$('#pw').value);}
+  catch(x){$('#err').textContent='E-poçt və ya şifrə yanlışdır. Yenidən yoxlayın.';return;}
+  $('#who').textContent=u.email;$('#login').hidden=true;$('#app').classList.add('on');
+  renderAll();
 });
 $('#logout').onclick=async()=>{await api.logout();$('#app').classList.remove('on');$('#login').hidden=false;$('#pw').value='';};
 
-/* bölmələr */
-document.querySelectorAll('nav [role=tab]').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('nav [role=tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
-  ['groups','requests','messages'].forEach(n=>$('#tab-'+n).hidden=n!==b.dataset.tab);
-  if(b.dataset.tab==='messages')renderChat();
-});
-
-/* qruplar */
-async function renderGroups(){
-  const gs=await api.listGroups();
-  $('#groupList').innerHTML=gs.length?gs.map(g=>`
-    <article class="node"><div><h3>${esc(g.name)}</h3><div class="id">${esc(g.id)}</div></div>
-    <div class="actions"><button class="code" data-copy="${esc(g.code)}" title="Kopyala">${esc(g.code)}</button>
-    <button class="btn sm" data-chg="${g.id}">Kodu dəyiş</button><button class="btn sm danger" data-del="${g.id}">Qrupu sil</button></div></article>`).join('')
-    :'<div class="empty">Hələ qrup yoxdur. Yuxarıdakı sahədən ilk qrupu yaradın.</div>';
-  $('#sGroups').textContent=gs.length;
-  $('#msgGroup').innerHTML=gs.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+/* ===== bölmələr ===== */
+function showTab(name){
+  document.querySelectorAll('nav [role=tab]').forEach(x=>x.setAttribute('aria-selected',x.dataset.tab===name));
+  ['groups','requests','messages'].forEach(n=>$('#tab-'+n).hidden=n!==name);
+  $('#main').classList.toggle('wide',name==='messages');
+  if(name==='messages')renderChat();
 }
-$('#newGroup').addEventListener('submit',async e=>{e.preventDefault();const n=$('#gname').value.trim();if(!n)return;await api.createGroup(n);$('#gname').value='';toast('Qrup yaradıldı');renderAll();});
+document.querySelectorAll('nav [role=tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* ===== statistika ===== */
+function renderStats(){
+  $('#sGroups').textContent=db.groups.length;
+  $('#sReq').textContent=db.requests.length;
+  $('#sMsg').textContent=Object.values(db.messages).reduce((a,b)=>a+b.length,0);
+  const c=$('#reqCount');c.hidden=!db.requests.length;c.textContent=db.requests.length;
+}
+
+/* ===== QRUPLAR ===== */
+async function renderGroups(){
+  const all=await api.listGroups();
+  const gs=all.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
+  $('#gTitle').textContent=`Bütün qruplar · ${all.length}`;
+  if(!all.length){$('#groupList').innerHTML=`<div class="empty" style="grid-column:1/-1">${I.grp}Hələ qrup yoxdur. Yuxarıdan ilk qrupu yaradın.</div>`;return;}
+  if(!gs.length){$('#groupList').innerHTML=`<div class="empty" style="grid-column:1/-1">«${esc(query)}» üzrə qrup tapılmadı.</div>`;return;}
+  $('#groupList').innerHTML=gs.map(g=>{
+    const n=(db.messages[g.id]||[]).length, m=g.members;
+    const faces=m.length?`<div class="avs">${m.slice(0,5).map(x=>av(x)).join('')}${m.length>5?`<span class="more">+${m.length-5}</span>`:''}</div>`:'<div class="nomem">Hələ üzv yoxdur</div>';
+    return `<article class="gcard${g.threat?' threat':''}">
+      <div class="gtop"><div><h3>${esc(g.name)}</h3>
+        <div class="meta"><span>${I.users}${m.length} üzv</span><span>${I.msg}${n} mesaj</span></div></div>
+        ${g.threat?`<button class="tag red" data-clear="${g.id}" title="Təhlükəsiz kimi işarələ" style="cursor:pointer">Təhlükə ✕</button>`:'<span class="tag green">Aktiv</span>'}
+      </div>
+      ${faces}
+      <div class="codebox"><div><small>Giriş kodu</small><span>${esc(g.code)}</span></div>
+        <button class="iconbtn" data-copy="${esc(g.code)}" title="Kodu kopyala" aria-label="Kodu kopyala">${I.copy}</button></div>
+      <div class="gactions">
+        <button class="btn sm" data-chg="${g.id}">${I.key}Yeni kod</button>
+        <button class="btn sm warn" data-threat="${g.id}">${I.shield}Təhlükə</button>
+        <button class="btn sm danger" data-del="${g.id}" aria-label="Qrupu sil">${I.trash}Sil</button>
+      </div></article>`;
+  }).join('');
+}
+$('#newGroup').addEventListener('submit',async e=>{
+  e.preventDefault();const n=$('#gname').value.trim();if(!n)return;
+  try{await api.createGroup(n);$('#gname').value='';query='';$('#gsearch').value='';toast('Qrup yaradıldı');renderAll();}
+  catch(x){console.error(x);toast('Qrup yaradılmadı, yenidən yoxlayın');}
+});
+$('#gsearch').addEventListener('input',e=>{query=e.target.value;renderGroups();});
 $('#groupList').addEventListener('click',async e=>{
-  const t=e.target.closest('button');if(!t)return;
-  if(t.dataset.copy){try{await navigator.clipboard.writeText(t.dataset.copy);toast('Kod kopyalandı');}catch{toast('Kopyalamaq alınmadı');}}
-  if(t.dataset.chg){await api.changeCode(t.dataset.chg);toast('Kod dəyişdirildi');renderGroups();}
-  if(t.dataset.del&&confirm('Bu qrup silinsin?')){await api.deleteGroup(t.dataset.del);toast('Qrup silindi');renderAll();}
+  const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+  if(d.copy){try{await navigator.clipboard.writeText(d.copy);toast('Kod kopyalandı');}catch{toast('Kopyalamaq alınmadı');}return;}
+  if(d.chg){await api.changeCode(d.chg);toast('Yeni kod yaradıldı');}
+  if(d.threat){
+    if(!confirm('Bu qrupda təhlükə var? Kod dəyişəcək və qrupda olanların siyahısı qeyd ediləcək.'))return;
+    const before=await api.markThreat(d.threat);toast(`Kod dəyişdi · ${before.length} nəfər qeyd edildi`);
+  }
+  if(d.clear){await api.clearThreat(d.clear);toast('Təhlükə işarəsi götürüldü');}
+  if(d.del){if(!confirm('Bu qrup və bütün mesajları silinsin?'))return;await api.deleteGroup(d.del);toast('Qrup silindi');}
+  renderAll();
 });
 
-/* sorğular */
+/* ===== SORĞULAR ===== */
 async function renderReq(){
   const rs=await api.listRequests();
-  $('#reqList').innerHTML=rs.length?rs.map(r=>`
-    <article class="node"><div><h3>${esc(r.user)}</h3><div class="id">«${esc(r.group)}» qrupuna qoşulmaq istəyir</div></div>
-    <div class="actions"><button class="btn sm primary" data-ok="${r.id}">Təsdiqlə</button><button class="btn sm danger" data-no="${r.id}">Rədd et</button></div></article>`).join('')
-    :'<div class="empty">Gözləyən sorğu yoxdur.</div>';
-  $('#sReq').textContent=rs.length;
-  const c=$('#reqCount');c.hidden=!rs.length;c.textContent=rs.length;
+  const gids=[...new Set(rs.map(r=>r.groupId))];
+  if(reqFilter!=='all'&&!gids.includes(reqFilter))reqFilter='all';
+  $('#reqChips').innerHTML=rs.length?[`<button class="chip" data-f="all" aria-pressed="${reqFilter==='all'}">Hamısı · ${rs.length}</button>`,
+    ...gids.map(id=>{const g=findG(id);return `<button class="chip" data-f="${id}" aria-pressed="${reqFilter===id}">${esc(g?g.name:'?')} · ${rs.filter(r=>r.groupId===id).length}</button>`;})].join(''):'';
+  const list=rs.filter(r=>reqFilter==='all'||r.groupId===reqFilter).sort((a,b)=>b.time-a.time);
+  $('#approveAll').hidden=list.length<2;
+  $('#reqList').innerHTML=list.length?list.map(r=>{const g=findG(r.groupId);return `
+    <article class="req">${av(r.user,'lg')}
+      <div class="req-info"><b>${esc(r.user)}</b><small><em>«${esc(g?g.name:'?')}»</em> qrupuna qoşulmaq istəyir · ${ago(r.time)}</small></div>
+      <div class="actions"><button class="btn sm primary" data-ok="${r.id}">${I.check}Təsdiqlə</button><button class="btn sm danger" data-no="${r.id}">${I.x}Rədd et</button></div>
+    </article>`;}).join('')
+    :`<div class="empty">${I.bell}Gözləyən sorğu yoxdur. Yeni sorğular burada görünəcək.</div>`;
 }
+$('#reqChips').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;reqFilter=c.dataset.f;renderReq();});
 $('#reqList').addEventListener('click',async e=>{
   const t=e.target.closest('button');if(!t)return;
-  const ok=!!t.dataset.ok;await api.resolveRequest(+(t.dataset.ok||t.dataset.no),ok);toast(ok?'Təsdiqləndi':'Rədd edildi');renderReq();
+  const ok=!!t.dataset.ok;await api.resolveRequest(t.dataset.ok||t.dataset.no,ok);
+  toast(ok?'Təsdiqləndi':'Rədd edildi');renderAll();
+});
+$('#approveAll').onclick=async()=>{
+  const list=db.requests.filter(r=>reqFilter==='all'||r.groupId===reqFilter);
+  if(!confirm(`${list.length} sorğunun hamısı təsdiqlənsin?`))return;
+  for(const r of list)await api.resolveRequest(r.id,true);
+  toast(`${list.length} sorğu təsdiqləndi`);renderAll();
+};
+
+/* ===== MESAJLAR ===== */
+async function renderChat(){
+  const gs=await api.listGroups();
+  if(!gs.find(g=>g.id===curGroup))curGroup=gs[0]?gs[0].id:null;
+  $('#glist').innerHTML=gs.length?gs.map(g=>{const ms=db.messages[g.id]||[],last=ms[ms.length-1];return `
+    <button class="gitem" role="option" data-g="${g.id}" aria-selected="${g.id===curGroup}">${av(g.name)}
+      <span class="t"><b>${esc(g.name)}</b><small>${last?esc((last.me?'Siz: ':last.who+': ')+last.text):'Mesaj yoxdur'}</small></span>
+      <span class="n">${ms.length}</span></button>`;}).join('')
+    :'<div class="empty">Qrup yoxdur</div>';
+  const g=findG(curGroup);
+  $('#msgText').disabled=!g;$('#sendForm button').disabled=!g;
+  if(!g){$('#chathead').innerHTML='<b>Qrup seçilməyib</b>';$('#chat').innerHTML=`<div class="empty" style="margin:auto">${I.grp}Əvvəlcə «Qruplar» bölməsində qrup yaradın.</div>`;return;}
+  $('#chathead').innerHTML=`<div class="l">${av(g.name)}<div><b>${esc(g.name)}</b><small>${g.members.length} üzv${g.threat?' · <span style="color:var(--pink)">təhlükə</span>':''}</small></div></div><span class="code">Kod: ${esc(g.code)}</span>`;
+  const ms=await api.listMessages(curGroup);
+  $('#chat').innerHTML=ms.length?ms.map(m=>`<div class="msg ${m.me?'me':'them'}">${m.me?'':`<span class="who" style="color:${colorOf(m.who)}">${esc(m.who)}</span>`}${esc(m.text)}${m.time?`<time>${hm(m.time)}</time>`:''}</div>`).join('')
+    :`<div class="empty" style="margin:auto;border:0">${I.msg}Bu qrupda hələ mesaj yoxdur. İlk mesajı siz yazın.</div>`;
+  $('#chat').scrollTop=$('#chat').scrollHeight;
+}
+$('#glist').addEventListener('click',e=>{const b=e.target.closest('.gitem');if(!b)return;curGroup=b.dataset.g;renderChat();$('#msgText').focus();});
+$('#sendForm').addEventListener('submit',async e=>{
+  e.preventDefault();const t=$('#msgText').value.trim();if(!t||!curGroup)return;
+  await api.sendMessage(curGroup,t);$('#msgText').value='';renderChat();renderStats();
 });
 
-/* mesajlar */
-async function renderChat(){
-  const gid=$('#msgGroup').value;if(!gid){$('#chat').innerHTML='<div class="empty">Əvvəlcə qrup yaradın.</div>';return;}
-  const ms=await api.listMessages(gid);
-  $('#chat').innerHTML=ms.length?ms.map(m=>`<div class="msg ${m.me?'me':'them'}"><small>${esc(m.who)}</small>${esc(m.text)}</div>`).join(''):'<div class="empty">Bu qrupda hələ mesaj yoxdur. İlk mesajı siz yazın.</div>';
-  $('#chat').scrollTop=1e6;
-  $('#sMsg').textContent=Object.values(db.messages).reduce((a,b)=>a+b.length,0);
+/* ===== fəaliyyət ===== */
+function renderFeed(){
+  const c={cyan:'var(--cyan)',pink:'var(--pink)',amber:'var(--amber)',ok:'var(--ok)'};
+  $('#feedList').innerHTML=db.feed.slice(0,8).map(f=>`<li><i style="background:${c[f.c]||c.cyan};box-shadow:0 0 10px ${c[f.c]||c.cyan}"></i><div><b>${esc(f.t)}</b><small>${ago(f.time||now())}</small></div></li>`).join('');
 }
-$('#msgGroup').onchange=renderChat;$('#refresh').onclick=renderChat;
-$('#sendForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('#msgText').value.trim();if(!t||!$('#msgGroup').value)return;await api.sendMessage($('#msgGroup').value,t);$('#msgText').value='';renderChat();});
+async function renderAll(){await renderGroups();await renderReq();await renderChat();renderFeed();renderStats();}
 
-function renderFeed(){$('#feedList').innerHTML=db.feed.slice(0,8).map(f=>`<li><i></i><div><b>${esc(f.t)}</b></div></li>`).join('');}
-async function renderAll(){await renderGroups();await renderReq();await renderChat();renderFeed();}
-
-/* arxa fon: hərəkətli şəbəkə */
+/* ===== arxa fon: hərəkətli şəbəkə ===== */
 (function(){
   const c=$('#net'),x=c.getContext('2d'),cols=['76,201,240','255,77,141','255,183,3'];
   let W,H,P=[];const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
