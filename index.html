@@ -660,6 +660,18 @@ function showPending(status, u){
 }
 
 async function gate(u, manual = false){
+  // Admin hesabı yalnız admin panelində işləyir — burada girişə icazə verilmir
+  const { data:isAdm } = await supabase.rpc('is_admin');
+  if(currentUid !== u.id) return;
+  if(isAdm === true){
+    await supabase.auth.signOut();
+    setTimeout(() => {
+      $('#auth-err').innerHTML = 'Bu hesab yalnız admin paneli üçündür. <a href="/admin" style="color:var(--cyan)">Admin panelə keç →</a>';
+      toast('Admin hesabı ilə burada daxil olmaq olmaz.');
+    }, 50);
+    return;
+  }
+
   const status = await approvalStatus(u);
   if(currentUid !== u.id) return;
   if(status === 'approved') return openApp(u, false);
