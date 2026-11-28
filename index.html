@@ -187,10 +187,32 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
     <div id="success-view" class="success hidden">
       <div class="check">✓</div>
       <h1>Qeydiyyatdan keçdiniz!</h1>
-      <h3>Admin təsdiqini gözləyin.</h3>
-      <p>Növbəti addımda dəvət kodunu yazın. Admin sorğunuzu təsdiqləyəndən sonra qrupa daxil ola biləcəksiniz.</p>
+      <h3>Hesabınız yaradıldı.</h3>
+      <p>Admin hesabınızı təsdiqləyəndən sonra chatbotun qrup kodunu daxil edə biləcəksiniz.</p>
       <p id="success-extra" class="hidden">E-poçt təsdiqi tələb olunursa, əvvəlcə poçtunuzu təsdiqləyin.</p>
-      <button id="go-home" type="button" class="btn">Əsas səhifə</button>
+      <button id="go-home" type="button" class="btn">Davam et</button>
+    </div>
+
+    <div id="pending-view" class="success hidden">
+      <div class="check" id="pending-icon" style="color:var(--amber);background:rgba(255,183,3,.1);border-color:rgba(255,183,3,.5);box-shadow:0 0 34px rgba(255,183,3,.22)">⏳</div>
+      <h1 id="pending-title">Adminin təsdiqini gözləyin</h1>
+      <h3 id="pending-email" style="color:var(--cyan)"></h3>
+      <p id="pending-text">Hesabınız adminə göndərilib. Admin təsdiqləyən kimi bu səhifə avtomatik yenilənəcək və qrup kodunu daxil edə biləcəksiniz.</p>
+      <button id="pending-check" type="button" class="btn primary">Yenidən yoxla</button>
+      <button id="pending-out" type="button" class="btn">Çıxış</button>
+    </div>
+
+    <div id="code-view" class="success hidden">
+      <div class="check" id="code-icon" style="color:var(--cyan);background:rgba(76,201,240,.1);border-color:rgba(76,201,240,.5);box-shadow:0 0 34px rgba(76,201,240,.22)">🔑</div>
+      <h1 id="code-title">Chatbotun qrup kodunu daxil edin</h1>
+      <h3 id="code-email" style="color:var(--cyan)"></h3>
+      <p id="code-text">Hesabınız təsdiqləndi. Admindən aldığınız qrup kodunu yazın.</p>
+      <form id="code-form" novalidate>
+        <input class="field" id="code-input" placeholder="Qrup kodu" autocomplete="off" style="text-align:center;font:500 18px 'JetBrains Mono',monospace;letter-spacing:.12em">
+        <button id="code-submit" class="btn primary" type="submit" style="margin-top:12px">Qoşul</button>
+      </form>
+      <button id="code-again" type="button" class="btn primary hidden">Başqa kod yaz</button>
+      <button id="code-out" type="button" class="btn">Çıxış</button>
     </div>
   </div>
 </section>
@@ -243,10 +265,10 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
     </section>
 
     <section class="panel glass" id="tab-join" hidden>
-      <h2>Qrupa qoşul</h2>
-      <p class="sub">Admindən aldığınız dəvət kodunu yazın. Sorğu admin təsdiqindən sonra aktivləşir və qrup siyahıda görünür.</p>
+      <h2>Chatbotun qrup kodunu daxil edin</h2>
+      <p class="sub">Hesabınız təsdiqlənib. Admindən aldığınız qrup kodunu yazın — admin qəbul edəndən sonra qrup «Söhbət» bölməsində görünəcək.</p>
       <form id="join-form" class="row">
-        <input class="field" id="invite" required placeholder="Dəvət kodu" autocomplete="off">
+        <input class="field" id="invite" required placeholder="Qrup kodu" autocomplete="off">
         <button class="btn primary" type="submit" style="white-space:nowrap">Qoşul</button>
       </form>
     </section>
@@ -572,11 +594,127 @@ function watchMembership(uid){
     .on('postgres_changes',
       { event:'INSERT', schema:'public', table:'group_members', filter:`user_id=eq.${uid}` },
       () => {
+        if(!$('#code-view').classList.contains('hidden')) showMainApp(user);
         loadGroups();
         feed('ok', 'Admin sorğunuzu təsdiqlədi. Qrup siyahıya əlavə olundu.');
         toast('Admin sorğunuzu təsdiqlədi. Qrup siyahıya əlavə olundu.');
       })
     .subscribe();
+}
+
+/* ===== HESAB TƏSDİQİ (admin onayı) ===== */
+let approvalChannel = null;
+
+async function approvalStatus(u){
+  const { data, error } = await supabase
+    .from('account_approvals').select('status').eq('user_id', u.id).maybeSingle();
+  if(error){ console.error(error); return 'error'; }
+  if(!data){
+    const { error:e2 } = await supabase.from('account_approvals').insert({ user_id:u.id, email:u.email });
+    if(e2 && e2.code !== '23505'){ console.error(e2); return 'error'; }
+    return 'pending';
+  }
+  return data.status;
+}
+
+async function stopApproval(){
+  if(!approvalChannel) return;
+  const ch = approvalChannel; approvalChannel = null;
+  try{ await supabase.removeChannel(ch); }catch(_){}
+}
+
+function watchApproval(u){
+  if(approvalChannel) return;
+  approvalChannel = supabase
+    .channel(`approval-${u.id}`)
+    .on('postgres_changes',
+      { event:'UPDATE', schema:'public', table:'account_approvals', filter:`user_id=eq.${u.id}` },
+      ev => {
+        if(currentUid !== u.id) return;
+        if(ev.new.status === 'approved'){ toast('Admin hesabınızı təsdiqlədi!'); openApp(u, true); }
+        else if(ev.new.status === 'rejected') showPending('rejected', u);
+      })
+    .subscribe();
+}
+
+function showPending(status, u){
+  $('#login-screen').classList.remove('hidden');
+  $('#app').classList.add('hidden');
+  $('#form-view').classList.add('hidden');
+  $('#success-view').classList.add('hidden');
+  $('#pending-view').classList.remove('hidden');
+  $('#pending-email').textContent = u?.email || '';
+  const rejected = status === 'rejected', err = status === 'error';
+  $('#pending-icon').textContent = rejected ? '✕' : err ? '!' : '⏳';
+  $('#pending-title').textContent = rejected ? 'Hesabınız rədd edildi'
+    : err ? 'Yoxlamaq alınmadı' : 'Adminin təsdiqini gözləyin';
+  $('#pending-text').textContent = rejected
+    ? 'Admin hesabınızı təsdiqləmədi. Ətraflı məlumat üçün adminlə əlaqə saxlayın.'
+    : err ? 'Hesab vəziyyətini yoxlamaq mümkün olmadı. Bir az sonra «Yenidən yoxla» basın.'
+    : 'Hesabınız adminə göndərilib. Admin təsdiqləyən kimi bu səhifə avtomatik yenilənəcək və qrup kodunu daxil edə biləcəksiniz.';
+  $('#pending-check').hidden = rejected;
+}
+
+async function gate(u, manual = false){
+  const status = await approvalStatus(u);
+  if(currentUid !== u.id) return;
+  if(status === 'approved') return openApp(u, false);
+  showPending(status, u);
+  if(status === 'pending'){
+    watchApproval(u);
+    if(manual) toast('Hələ təsdiqlənməyib. Admin təsdiqini gözləyin.');
+  }
+}
+
+/* Təsdiqlənib: qrupu yoxdursa kiçik «qrup kodu» pəncərəsi, varsa çat */
+async function openApp(u, justApproved){
+  stopApproval();
+  $('#pending-view').classList.add('hidden');
+  const { data, error } = await supabase.from('groups').select('id').limit(1);
+  if(currentUid !== u.id) return;
+  watchMembership(u.id);
+  if(!error && !data?.length) return showCode(u, justApproved);
+  showMainApp(u, justApproved);
+}
+
+function showCode(u, justApproved, state = 'enter'){
+  $('#login-screen').classList.remove('hidden');
+  $('#app').classList.add('hidden');
+  ['form-view','success-view','pending-view'].forEach(id => $('#' + id).classList.add('hidden'));
+  $('#code-view').classList.remove('hidden');
+  $('#code-email').textContent = u?.email || '';
+  const sent = state === 'sent';
+  $('#code-icon').textContent = sent ? '⏳' : '🔑';
+  $('#code-title').textContent = sent ? 'Sorğunuz adminə göndərildi' : 'Chatbotun qrup kodunu daxil edin';
+  $('#code-text').textContent = sent
+    ? 'Admin sizi qrupa qəbul edən kimi söhbət avtomatik açılacaq.'
+    : (justApproved ? 'Admin hesabınızı təsdiqlədi! ' : 'Hesabınız təsdiqlənib. ') + 'Admindən aldığınız qrup kodunu yazın.';
+  $('#code-form').classList.toggle('hidden', sent);
+  $('#code-again').classList.toggle('hidden', !sent);
+  if(!sent) setTimeout(() => $('#code-input').focus(), 50);
+}
+
+function showMainApp(u, justApproved){
+  $('#code-view').classList.add('hidden');
+  $('#pending-view').classList.add('hidden');
+  $('#form-view').classList.remove('hidden');
+  $('#login-screen').classList.add('hidden');
+  $('#app').classList.remove('hidden');
+  $('#account-avatar').textContent = u.email?.[0]?.toUpperCase() || 'A';
+  $('#account-label').textContent = u.email || '';
+  showTab('chat');
+  feed('sys', justApproved ? 'Hesabınız təsdiqləndi.' : 'Təhlükəsiz kanal hazırdır.');
+  loadGroups();
+}
+
+/* Qrup koduna qoşulma (həm kiçik pəncərə, həm «Qrupa qoşul» bölməsi) */
+async function joinWithCode(code){
+  const { data, error } = await supabase.rpc('join_chat_group', { invite_code: code });
+  if(error){ toast(error.message); return 'error'; }
+  if(data?.status === 'member') return { status:'member', group_id:data.group_id };
+  if(data?.status === 'pending') return 'pending';
+  toast('Qrup kodu tapılmadı.');
+  return 'invalid';
 }
 
 /* ===== LOGIN / LOGOUT UI ===== */
@@ -592,20 +730,18 @@ function showAuth(session){
   }
 
   currentUid = newUid;
-  const signed = !!user;
 
-  const showApp = signed && !pendingSuccess;
-  $('#login-screen').classList.toggle('hidden', showApp);
-  $('#app').classList.toggle('hidden', !showApp);
+  // Daxil olub: əvvəlcə hesabın admin tərəfindən təsdiqini yoxla
+  if(newUser && !pendingSuccess){ gate(newUser); return; }
 
-  if(signed){
-    $('#account-avatar').textContent = user.email?.[0]?.toUpperCase() || 'A';
-    $('#account-label').textContent = user.email || '';
-    showTab('chat');
-    feed('sys', 'Təhlükəsiz kanal hazırdır.');
-    loadGroups();
-    watchMembership(newUid);
-  }else{
+  $('#login-screen').classList.remove('hidden');
+  $('#app').classList.add('hidden');
+
+  if(!newUser){
+    stopApproval();
+    $('#pending-view').classList.add('hidden');
+    $('#code-view').classList.add('hidden');
+    if(!pendingSuccess) $('#form-view').classList.remove('hidden');
     stopMembers();
     activeGroup = null;
     selectToken++;
@@ -641,7 +777,9 @@ async function loadGroups(){
   activeGroup = null;
 
   if(!data?.length){
-    resetRoom('Hələ qrup yoxdur', 'Dəvət kodu ilə qrupa qoşulun.', 'Sizə qoşulmaq üçün dəvət kodu lazımdır.');
+    resetRoom('Hələ qrup yoxdur', 'Qrup kodu ilə qrupa qoşulun.', 'Qoşulmaq üçün chatbotun qrup kodunu daxil edin.');
+    showTab('join');
+    $('#invite').focus();
   }else{
     resetRoom('Qrup seçin', 'Söhbətə qoşulmaq üçün qrup seçin.', 'Yuxarıdakı siyahıdan qrup seçin.');
   }
@@ -838,6 +976,36 @@ if(!configured){
       button.textContent = signup ? 'Hesab yarat' : 'Daxil ol';
     }
   };
+
+  /* --- Təsdiq gözləmə ekranı --- */
+  $('#pending-check').onclick = () => { if(user) gate(user, true); };
+  $('#pending-out').onclick = async () => { await supabase.auth.signOut(); toast('Hesabdan çıxış edildi.'); };
+
+  /* --- Qrup kodu pəncərəsi --- */
+  $('#code-form').onsubmit = async e => {
+    e.preventDefault();
+    const code = $('#code-input').value.trim();
+    if(!code) return toast('Qrup kodunu yazın.');
+    const btn = $('#code-submit');
+    btn.disabled = true; btn.textContent = 'Yoxlanılır...';
+    try{
+      const r = await joinWithCode(code);
+      if(r?.status === 'member'){
+        $('#code-input').value = '';
+        showMainApp(user);
+        await loadGroups();
+        $('#groups').value = r.group_id;
+        await chooseGroup(r.group_id);
+        showTab('chat');
+        toast('Qrupa qoşuldunuz.');
+      }else if(r === 'pending'){
+        $('#code-input').value = '';
+        showCode(user, false, 'sent');
+      }
+    }finally{ btn.disabled = false; btn.textContent = 'Qoşul'; }
+  };
+  $('#code-again').onclick = () => showCode(user, false, 'enter');
+  $('#code-out').onclick = async () => { await supabase.auth.signOut(); toast('Hesabdan çıxış edildi.'); };
 
   /* --- Çıxış --- */
   $('#signout').onclick = async () => {
