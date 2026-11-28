@@ -725,12 +725,15 @@ function showMainApp(u, justApproved){
 
 /* Qrup koduna qoşulma (həm kiçik pəncərə, həm «Qrupa qoşul» bölməsi) */
 async function joinWithCode(code){
-  const { data, error } = await supabase.rpc('join_chat_group', { invite_code: code });
-  if(error){ toast(error.message); return 'error'; }
-  if(data?.status === 'member') return { status:'member', group_id:data.group_id };
-  if(data?.status === 'pending') return 'pending';
-  toast('Qrup kodu tapılmadı.');
-  return 'invalid';
+  const { data, error } = await supabase.rpc('request_join', { p_code: code });
+  if(error){ console.error(error); toast('Xəta: ' + error.message); return 'error'; }
+  switch(data?.status){
+    case 'member':        return { status:'member', group_id:data.group_id };
+    case 'pending':       return 'pending';
+    case 'not_approved':  toast('Hesabınız hələ admin tərəfindən təsdiqlənməyib.'); return 'error';
+    case 'not_logged_in': toast('Əvvəlcə daxil olun.'); return 'error';
+    default:              toast('Qrup kodu tapılmadı. Kodu yoxlayın.'); return 'invalid';
+  }
 }
 
 /* ===== LOGIN / LOGOUT UI ===== */
@@ -1079,26 +1082,26 @@ if(!configured){
     const code = $('#invite').value.trim();
     if(!code) return;
 
-    const { data, error } = await supabase.rpc('join_chat_group', { invite_code: code });
-    if(error) return toast(error.message);
-
-    $('#invite').value = '';
-
-    // Cavab: { status: 'member' | 'pending' | 'invalid' }
-    if(data?.status === 'member'){
-      await loadGroups();
-      $('#groups').value = data.group_id;
-      await chooseGroup(data.group_id);
-      showTab('chat');
-      feed('ok', 'Qrupa uğurla qoşuldunuz.');
-      return toast('Qrupa qoşuldunuz.');
-    }
-    if(data?.status === 'pending'){
-      feed('warn', 'Sorğu adminə göndərildi, təsdiq gözlənilir.');
-      return toast('Sorğu adminə göndərildi. Təsdiqdən sonra qrup siyahıda görünəcək.');
-    }
-    feed('warn', 'Yanlış dəvət kodu cəhdi.');
-    toast('Dəvət kodu tapılmadı.');
+    const btn = e.submitter || $('#join-form button');
+    btn.disabled = true;
+    try{
+      const r = await joinWithCode(code);
+      if(r?.status === 'member'){
+        $('#invite').value = '';
+        await loadGroups();
+        $('#groups').value = r.group_id;
+        await chooseGroup(r.group_id);
+        showTab('chat');
+        feed('ok', 'Qrupa uğurla qoşuldunuz.');
+        return toast('Qrupa qoşuldunuz.');
+      }
+      if(r === 'pending'){
+        $('#invite').value = '';
+        feed('warn', 'Sorğu adminə göndərildi, təsdiq gözlənilir.');
+        return toast('Sorğu adminə göndərildi. Təsdiqdən sonra qrup siyahıda görünəcək.');
+      }
+      if(r === 'invalid') feed('warn', 'Yanlış qrup kodu cəhdi.');
+    }finally{ btn.disabled = false; }
   };
 
   /* --- Mesaj göndər --- */
@@ -1115,7 +1118,7 @@ if(!configured){
 
     const { data, error } = await supabase
       .from('messages')
-      .insert({ group_id: activeGroup.id, body })
+      .insert({ group_id: activeGroup.id, user_id: user.id, body })
       .select('id,group_id,user_id,body,created_at')
       .single();
 
