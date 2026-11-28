@@ -269,25 +269,23 @@ main.wide .feed{display:none}
 <div id="toast" class="glass" role="status"></div>
 
 <script>
-/* ===== Məlumat qatı (DEMO) =====
-   Məlumatlar hələlik brauzerdə saxlanır. Supabase-ə bağlamaq üçün
-   yalnız "api" obyektinin funksiyalarını dəyişin — interfeys eyni qalır. */
-const KEY='chatbot_admin_v2';
+/* ===== Məlumat qatı — Supabase (groups, join_requests, group_members, messages) ===== */
+const KEY='chatbot_admin_feed';
 const now=()=>Date.now();
-const uid=()=>(crypto.randomUUID?crypto.randomUUID():now().toString(36)+Math.random().toString(36).slice(2));
-const rand=()=>[...crypto.getRandomValues(new Uint8Array(4))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+const rand=()=>[...crypto.getRandomValues(new Uint8Array(6))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+const ts=s=>new Date(s).getTime();
 
-function seed(){ return {groups:[],requests:[],messages:{},feed:[]}; }
-try{localStorage.removeItem('chatbot_admin_demo');}catch(e){}
-let db=null;
-try{db=JSON.parse(localStorage.getItem(KEY));}catch(e){}
-if(!db||!Array.isArray(db.groups))db=seed();
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){}};
-const findG=id=>db.groups.find(g=>g.id===id);
-function log(t,c='cyan'){db.feed.unshift({t,c,time:now()});db.feed=db.feed.slice(0,30);save();renderFeed();}
+/* yaddaş keşi (hər yükləmədə serverdən yenilənir) */
+let G=[], R=[];
+const findG=id=>G.find(g=>g.id===id);
+/* "Son fəaliyyət" yalnız bu brauzerdə saxlanır */
+let feed=[];
+try{feed=JSON.parse(localStorage.getItem(KEY))||[];}catch(e){}
+try{localStorage.removeItem('chatbot_admin_v2');localStorage.removeItem('chatbot_admin_demo');}catch(e){}
+function log(t,c='cyan'){feed.unshift({t,c,time:now()});feed=feed.slice(0,30);try{localStorage.setItem(KEY,JSON.stringify(feed));}catch(e){}renderFeed();}
 
 /* ===== Supabase girişi (admin üçün AYRI saxlanır, F5-dən sonra qalır) ===== */
-let sb=null;
+let sb=null, me=null;
 async function getSb(){
   if(sb)return sb;
   const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');
@@ -301,6 +299,7 @@ async function checkAdmin(){
   const {data,error}=await sb.rpc('is_admin');
   if(error||!data){await sb.auth.signOut();const e=new Error('notadmin');e.code='notadmin';throw e;}
 }
+function fail(what,error){console.error(error);toast(what+': '+(error.message||error));}
 
 const api={
   async login(email,pass){
@@ -308,21 +307,21 @@ const api={
     const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
     if(error)throw error;
     await checkAdmin();
-    return data.user;
+    me=data.user;return data.user;
   },
-  async restore(){                      // səhifə açılanda/F5-də girişi bərpa edir
+  async restore(){
     await getSb();
     const {data}=await sb.auth.getSession();
     if(!data.session)return null;
     await checkAdmin();
-    return data.session.user;
+    me=data.session.user;return me;
   },
-  async logout(){ if(sb)await sb.auth.signOut(); },
-  /* hesab təsdiqi — real Supabase (account_approvals cədvəli) */
+  async logout(){ if(sb)await sb.auth.signOut(); me=null; },
+
+  /* hesab təsdiqi */
   async listAccounts(){
-    if(!sb)return [];
     const {data,error}=await sb.from('account_approvals').select('user_id,email,created_at').eq('status','pending').order('created_at',{ascending:false});
-    if(error){console.error(error);toast('Hesablar yüklənmədi: '+error.message);return [];}
+    if(error){fail('Hesablar yüklənmədi',error);return [];}
     return data||[];
   },
   async resolveAccount(uid,ok,email){
@@ -330,34 +329,76 @@ const api={
     if(error)throw error;
     log(`${email} hesabı ${ok?'təsdiqləndi':'rədd edildi'}`,ok?'ok':'pink');
   },
-  async listGroups(){ return db.groups; },
-  async createGroup(name){
-    const g={id:uid(),name,code:rand(),members:[],threat:false,created:now()};
-    db.groups.unshift(g); db.messages[g.id]=[]; save(); log(`«${name}» qrupu yaradıldı`,'cyan'); return g;
+
+  /* qruplar */
+  async loadGroups(){
+    const {data,error}=await sb.rpc('admin_groups');
+    if(error){fail('Qruplar yüklənmədi',error);G=[];return G;}
+    G=(data||[]).map(g=>({id:g.id,name:g.name,code:g.invite_code,threat:!!g.threat,created:ts(g.created_at),
+      members:g.members||[],n:Number(g.msg_count)||0,
+      last:g.last_body!=null?{who:g.last_email||'?',text:g.last_body}:null}));
+    return G;
   },
-  async changeCode(id){ const g=findG(id); g.code=rand(); save(); log(`«${g.name}» qrupunun kodu dəyişdirildi`,'amber'); return g; },
+  async createGroup(name){
+    const {error}=await sb.from('groups').insert({name,invite_code:rand(),created_by:me.id});
+    if(error)throw error;
+    log(`«${name}» qrupu yaradıldı`,'cyan');
+  },
+  async changeCode(id){
+    const g=findG(id);
+    const {error}=await sb.from('groups').update({invite_code:rand()}).eq('id',id);
+    if(error)throw error;
+    log(`«${g?g.name:'?'}» qrupunun kodu dəyişdirildi`,'amber');
+  },
   async markThreat(id){
-    const g=findG(id), before=[...g.members];
-    g.code=rand(); g.threat=true; save();
-    log(`Təhlükə: «${g.name}». Təhlükədən əvvəl qrupda olanlar: ${before.join(', ')||'heç kim'}`,'pink');
+    const g=findG(id), before=g?[...g.members]:[];
+    const {error}=await sb.from('groups').update({invite_code:rand(),threat:true}).eq('id',id);
+    if(error)throw error;
+    log(`Təhlükə: «${g?g.name:'?'}». Təhlükədən əvvəl qrupda olanlar: ${before.join(', ')||'heç kim'}`,'pink');
     return before;
   },
-  async clearThreat(id){ const g=findG(id); g.threat=false; save(); log(`«${g.name}» təhlükəsiz kimi işarələndi`,'ok'); },
+  async clearThreat(id){
+    const g=findG(id);
+    const {error}=await sb.from('groups').update({threat:false}).eq('id',id);
+    if(error)throw error;
+    log(`«${g?g.name:'?'}» təhlükəsiz kimi işarələndi`,'ok');
+  },
   async deleteGroup(id){
     const g=findG(id);
-    db.groups=db.groups.filter(x=>x.id!==id); delete db.messages[id];
-    db.requests=db.requests.filter(r=>r.groupId!==id); save(); log(`«${g.name}» qrupu silindi`,'pink');
+    for(const t of ['messages','join_requests','group_members']){
+      const {error}=await sb.from(t).delete().eq('group_id',id);
+      if(error)throw error;
+    }
+    const {error}=await sb.from('groups').delete().eq('id',id);
+    if(error)throw error;
+    log(`«${g?g.name:'?'}» qrupu silindi`,'pink');
   },
-  async listRequests(){ return db.requests; },
+
+  /* qoşulma sorğuları */
+  async loadRequests(){
+    const {data,error}=await sb.from('join_requests').select('id,user_email,group_id,created_at').eq('status','pending').order('created_at',{ascending:false});
+    if(error){fail('Sorğular yüklənmədi',error);R=[];return R;}
+    R=(data||[]).map(r=>({id:r.id,user:r.user_email||'(email yoxdur)',groupId:r.group_id,time:ts(r.created_at)}));
+    return R;
+  },
   async resolveRequest(id,ok){
-    const r=db.requests.find(x=>x.id===id); if(!r)return;
-    db.requests=db.requests.filter(x=>x.id!==id);
-    const g=findG(r.groupId);
-    if(ok&&g&&!g.members.includes(r.user))g.members.push(r.user);
-    save(); log(`${r.user} → «${g?g.name:'?'}» ${ok?'təsdiqləndi':'rədd edildi'}`,ok?'ok':'pink');
+    const r=R.find(x=>x.id===id);
+    const {error}=await sb.rpc('admin_resolve_request',{p_id:id,p_ok:ok});
+    if(error)throw error;
+    const g=r&&findG(r.groupId);
+    log(`${r?r.user:'?'} → «${g?g.name:'?'}» ${ok?'təsdiqləndi':'rədd edildi'}`,ok?'ok':'pink');
   },
-  async listMessages(gid){ return db.messages[gid]||[]; },
-  async sendMessage(gid,text){ (db.messages[gid]=db.messages[gid]||[]).push({who:'Admin',me:true,text,time:now()}); save(); }
+
+  /* mesajlar */
+  async listMessages(gid){
+    const {data,error}=await sb.rpc('group_messages',{p_group:gid});
+    if(error){fail('Mesajlar yüklənmədi',error);return [];}
+    return (data||[]).map(m=>({who:m.email||'?',me:m.user_id===me?.id||m.from_admin,text:m.body,time:ts(m.created_at)}));
+  },
+  async sendMessage(gid,text){
+    const {error}=await sb.from('messages').insert({group_id:gid,user_id:me.id,body:text});
+    if(error)throw error;
+  }
 };
 
 /* ===== köməkçilər ===== */
@@ -366,10 +407,10 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const COLS=['var(--cyan)','var(--pink)','var(--amber)','var(--ok)'];
 const colorOf=n=>COLS[[...String(n)].reduce((a,c)=>a+c.charCodeAt(0),0)%COLS.length];
 const av=(n,cls='')=>`<span class="av ${cls}" style="background:${colorOf(n)}" title="${esc(n)}">${esc((String(n)[0]||'?').toUpperCase())}</span>`;
-function ago(ts){const s=Math.floor((now()-ts)/1000);
+function ago(t){const s=Math.floor((now()-t)/1000);
   if(s<60)return 'indicə'; if(s<3600)return Math.floor(s/60)+' dəq əvvəl';
   if(s<86400)return Math.floor(s/3600)+' saat əvvəl'; return Math.floor(s/86400)+' gün əvvəl';}
-const hm=ts=>new Date(ts).toLocaleTimeString('az',{hour:'2-digit',minute:'2-digit'});
+const hm=t=>new Date(t).toLocaleTimeString('az',{hour:'2-digit',minute:'2-digit'});
 const I={
   users:'<svg class="i s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/></svg>',
   msg:'<svg class="i s" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>',
@@ -383,12 +424,12 @@ const I={
   grp:'<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7"/></svg>'
 };
 let toastT;
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2400);}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2800);}
 
 let query='', reqFilter='all', curGroup=null;
 
 /* ===== giriş ===== */
-function enter(u){$('#who').textContent=u.email||'';$('#login').hidden=true;$('#app').classList.add('on');renderAll();}
+function enter(u){$('#who').textContent=u.email||'';$('#login').hidden=true;$('#app').classList.add('on');refresh();watch();}
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();$('#err').textContent='';
   const btn=e.submitter||$('#loginForm button');btn.disabled=true;btn.textContent='Yoxlanılır...';
@@ -400,8 +441,7 @@ $('#loginForm').addEventListener('submit',async e=>{
       :'E-poçt və ya şifrə yanlışdır. Yenidən yoxlayın.';
   }finally{btn.disabled=false;btn.textContent='Daxil ol';}
 });
-$('#logout').onclick=async()=>{await api.logout();$('#app').classList.remove('on');$('#login').hidden=false;$('#pw').value='';};
-/* səhifə açılanda: əvvəl daxil olmusunuzsa, birbaşa panelə keçir */
+$('#logout').onclick=async()=>{unwatch();await api.logout();$('#app').classList.remove('on');$('#login').hidden=false;$('#pw').value='';};
 api.restore().then(u=>{if(u)enter(u);}).catch(x=>{
   if(x.code==='notadmin')$('#err').textContent='Bu hesabın admin icazəsi yoxdur.';
 });
@@ -417,26 +457,25 @@ document.querySelectorAll('nav [role=tab]').forEach(b=>b.onclick=()=>showTab(b.d
 
 /* ===== statistika ===== */
 function renderStats(){
-  $('#sGroups').textContent=db.groups.length;
-  const pend=db.requests.length+accCount;
+  $('#sGroups').textContent=G.length;
+  const pend=R.length+accCount;
   $('#sReq').textContent=pend;
-  $('#sMsg').textContent=Object.values(db.messages).reduce((a,b)=>a+b.length,0);
+  $('#sMsg').textContent=G.reduce((a,g)=>a+g.n,0);
   const c=$('#reqCount');c.hidden=!pend;c.textContent=pend;
 }
 
 /* ===== QRUPLAR ===== */
-async function renderGroups(){
-  const all=await api.listGroups();
-  const gs=all.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
-  $('#gTitle').textContent=`Bütün qruplar · ${all.length}`;
-  if(!all.length){$('#groupList').innerHTML=`<div class="empty" style="grid-column:1/-1">${I.grp}Hələ qrup yoxdur. Yuxarıdan ilk qrupu yaradın.</div>`;return;}
+function renderGroups(){
+  const gs=G.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
+  $('#gTitle').textContent=`Bütün qruplar · ${G.length}`;
+  if(!G.length){$('#groupList').innerHTML=`<div class="empty" style="grid-column:1/-1">${I.grp}Hələ qrup yoxdur. Yuxarıdan ilk qrupu yaradın.</div>`;return;}
   if(!gs.length){$('#groupList').innerHTML=`<div class="empty" style="grid-column:1/-1">«${esc(query)}» üzrə qrup tapılmadı.</div>`;return;}
   $('#groupList').innerHTML=gs.map(g=>{
-    const n=(db.messages[g.id]||[]).length, m=g.members;
+    const m=g.members;
     const faces=m.length?`<div class="avs">${m.slice(0,5).map(x=>av(x)).join('')}${m.length>5?`<span class="more">+${m.length-5}</span>`:''}</div>`:'<div class="nomem">Hələ üzv yoxdur</div>';
     return `<article class="gcard${g.threat?' threat':''}">
       <div class="gtop"><div><h3>${esc(g.name)}</h3>
-        <div class="meta"><span>${I.users}${m.length} üzv</span><span>${I.msg}${n} mesaj</span></div></div>
+        <div class="meta"><span>${I.users}${m.length} üzv</span><span>${I.msg}${g.n} mesaj</span></div></div>
         ${g.threat?`<button class="tag red" data-clear="${g.id}" title="Təhlükəsiz kimi işarələ" style="cursor:pointer">Təhlükə ✕</button>`:'<span class="tag green">Aktiv</span>'}
       </div>
       ${faces}
@@ -451,32 +490,34 @@ async function renderGroups(){
 }
 $('#newGroup').addEventListener('submit',async e=>{
   e.preventDefault();const n=$('#gname').value.trim();if(!n)return;
-  try{await api.createGroup(n);$('#gname').value='';query='';$('#gsearch').value='';toast('Qrup yaradıldı');renderAll();}
-  catch(x){console.error(x);toast('Qrup yaradılmadı, yenidən yoxlayın');}
+  try{await api.createGroup(n);$('#gname').value='';query='';$('#gsearch').value='';toast('Qrup yaradıldı');refresh();}
+  catch(x){fail('Qrup yaradılmadı',x);}
 });
 $('#gsearch').addEventListener('input',e=>{query=e.target.value;renderGroups();});
 $('#groupList').addEventListener('click',async e=>{
   const t=e.target.closest('button');if(!t)return;const d=t.dataset;
   if(d.copy){try{await navigator.clipboard.writeText(d.copy);toast('Kod kopyalandı');}catch{toast('Kopyalamaq alınmadı');}return;}
-  if(d.chg){await api.changeCode(d.chg);toast('Yeni kod yaradıldı');}
-  if(d.threat){
-    if(!confirm('Bu qrupda təhlükə var? Kod dəyişəcək və qrupda olanların siyahısı qeyd ediləcək.'))return;
-    const before=await api.markThreat(d.threat);toast(`Kod dəyişdi · ${before.length} nəfər qeyd edildi`);
-  }
-  if(d.clear){await api.clearThreat(d.clear);toast('Təhlükə işarəsi götürüldü');}
-  if(d.del){if(!confirm('Bu qrup və bütün mesajları silinsin?'))return;await api.deleteGroup(d.del);toast('Qrup silindi');}
-  renderAll();
+  try{
+    if(d.chg){await api.changeCode(d.chg);toast('Yeni kod yaradıldı');}
+    if(d.threat){
+      if(!confirm('Bu qrupda təhlükə var? Kod dəyişəcək və qrupda olanların siyahısı qeyd ediləcək.'))return;
+      const before=await api.markThreat(d.threat);toast(`Kod dəyişdi · ${before.length} nəfər qeyd edildi`);
+    }
+    if(d.clear){await api.clearThreat(d.clear);toast('Təhlükə işarəsi götürüldü');}
+    if(d.del){if(!confirm('Bu qrup və bütün mesajları silinsin?'))return;await api.deleteGroup(d.del);toast('Qrup silindi');}
+  }catch(x){fail('Alınmadı',x);}
+  refresh();
 });
 
 /* ===== HESAB TƏSDİQİ ===== */
-let accCount=0, accChannel=null;
+let accCount=0;
 async function renderAccounts(){
   const list=await api.listAccounts();
   accCount=list.length;
   $('#accN').textContent=list.length?`· ${list.length}`:'';
   $('#accList').innerHTML=list.length?list.map(a=>`
     <article class="req">${av(a.email||'?','lg')}
-      <div class="req-info"><b>${esc(a.email||'(email yoxdur)')}</b><small>Qeydiyyatdan keçib, təsdiq gözləyir · ${ago(new Date(a.created_at).getTime())}</small></div>
+      <div class="req-info"><b>${esc(a.email||'(email yoxdur)')}</b><small>Qeydiyyatdan keçib, təsdiq gözləyir · ${ago(ts(a.created_at))}</small></div>
       <div class="actions"><button class="btn sm primary" data-aok="${a.user_id}" data-em="${esc(a.email||'')}">${I.check}Təsdiqlə</button><button class="btn sm danger" data-ano="${a.user_id}" data-em="${esc(a.email||'')}">${I.x}Rədd et</button></div>
     </article>`).join('')
     :`<div class="empty">${I.users}Təsdiq gözləyən yeni hesab yoxdur.</div>`;
@@ -486,24 +527,17 @@ $('#accList').addEventListener('click',async e=>{
   const t=e.target.closest('button');if(!t)return;
   const ok=!!t.dataset.aok;
   try{await api.resolveAccount(t.dataset.aok||t.dataset.ano,ok,t.dataset.em);toast(ok?'Hesab təsdiqləndi':'Hesab rədd edildi');}
-  catch(x){console.error(x);toast('Alınmadı: '+x.message);}
+  catch(x){fail('Alınmadı',x);}
   renderAccounts();
 });
-function watchAccounts(){
-  if(!sb||accChannel)return;
-  accChannel=sb.channel('admin-approvals')
-    .on('postgres_changes',{event:'*',schema:'public',table:'account_approvals'},()=>renderAccounts())
-    .subscribe();
-}
 
-/* ===== SORĞULAR ===== */
-async function renderReq(){
-  const rs=await api.listRequests();
-  const gids=[...new Set(rs.map(r=>r.groupId))];
+/* ===== QRUPA QOŞULMA SORĞULARI ===== */
+function renderReq(){
+  const gids=[...new Set(R.map(r=>r.groupId))];
   if(reqFilter!=='all'&&!gids.includes(reqFilter))reqFilter='all';
-  $('#reqChips').innerHTML=rs.length?[`<button class="chip" data-f="all" aria-pressed="${reqFilter==='all'}">Hamısı · ${rs.length}</button>`,
-    ...gids.map(id=>{const g=findG(id);return `<button class="chip" data-f="${id}" aria-pressed="${reqFilter===id}">${esc(g?g.name:'?')} · ${rs.filter(r=>r.groupId===id).length}</button>`;})].join(''):'';
-  const list=rs.filter(r=>reqFilter==='all'||r.groupId===reqFilter).sort((a,b)=>b.time-a.time);
+  $('#reqChips').innerHTML=R.length?[`<button class="chip" data-f="all" aria-pressed="${reqFilter==='all'}">Hamısı · ${R.length}</button>`,
+    ...gids.map(id=>{const g=findG(id);return `<button class="chip" data-f="${id}" aria-pressed="${reqFilter===id}">${esc(g?g.name:'?')} · ${R.filter(r=>r.groupId===id).length}</button>`;})].join(''):'';
+  const list=R.filter(r=>reqFilter==='all'||r.groupId===reqFilter);
   $('#approveAll').hidden=list.length<2;
   $('#reqList').innerHTML=list.length?list.map(r=>{const g=findG(r.groupId);return `
     <article class="req">${av(r.user,'lg')}
@@ -515,24 +549,26 @@ async function renderReq(){
 $('#reqChips').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;reqFilter=c.dataset.f;renderReq();});
 $('#reqList').addEventListener('click',async e=>{
   const t=e.target.closest('button');if(!t)return;
-  const ok=!!t.dataset.ok;await api.resolveRequest(t.dataset.ok||t.dataset.no,ok);
-  toast(ok?'Təsdiqləndi':'Rədd edildi');renderAll();
+  const ok=!!t.dataset.ok;
+  try{await api.resolveRequest(t.dataset.ok||t.dataset.no,ok);toast(ok?'Təsdiqləndi':'Rədd edildi');}
+  catch(x){fail('Alınmadı',x);}
+  refresh();
 });
 $('#approveAll').onclick=async()=>{
-  const list=db.requests.filter(r=>reqFilter==='all'||r.groupId===reqFilter);
+  const list=R.filter(r=>reqFilter==='all'||r.groupId===reqFilter);
   if(!confirm(`${list.length} sorğunun hamısı təsdiqlənsin?`))return;
-  for(const r of list)await api.resolveRequest(r.id,true);
-  toast(`${list.length} sorğu təsdiqləndi`);renderAll();
+  try{for(const r of list)await api.resolveRequest(r.id,true);toast(`${list.length} sorğu təsdiqləndi`);}
+  catch(x){fail('Alınmadı',x);}
+  refresh();
 };
 
 /* ===== MESAJLAR ===== */
 async function renderChat(){
-  const gs=await api.listGroups();
-  if(!gs.find(g=>g.id===curGroup))curGroup=gs[0]?gs[0].id:null;
-  $('#glist').innerHTML=gs.length?gs.map(g=>{const ms=db.messages[g.id]||[],last=ms[ms.length-1];return `
+  if(!G.find(g=>g.id===curGroup))curGroup=G[0]?G[0].id:null;
+  $('#glist').innerHTML=G.length?G.map(g=>`
     <button class="gitem" role="option" data-g="${g.id}" aria-selected="${g.id===curGroup}">${av(g.name)}
-      <span class="t"><b>${esc(g.name)}</b><small>${last?esc((last.me?'Siz: ':last.who+': ')+last.text):'Mesaj yoxdur'}</small></span>
-      <span class="n">${ms.length}</span></button>`;}).join('')
+      <span class="t"><b>${esc(g.name)}</b><small>${g.last?esc(g.last.who+': '+g.last.text):'Mesaj yoxdur'}</small></span>
+      <span class="n">${g.n}</span></button>`).join('')
     :'<div class="empty">Qrup yoxdur</div>';
   const g=findG(curGroup);
   $('#msgText').disabled=!g;$('#sendForm button').disabled=!g;
@@ -546,16 +582,42 @@ async function renderChat(){
 $('#glist').addEventListener('click',e=>{const b=e.target.closest('.gitem');if(!b)return;curGroup=b.dataset.g;renderChat();$('#msgText').focus();});
 $('#sendForm').addEventListener('submit',async e=>{
   e.preventDefault();const t=$('#msgText').value.trim();if(!t||!curGroup)return;
-  await api.sendMessage(curGroup,t);$('#msgText').value='';renderChat();renderStats();
+  try{await api.sendMessage(curGroup,t);$('#msgText').value='';}
+  catch(x){fail('Mesaj göndərilmədi',x);}
+  refresh();
 });
 
 /* ===== fəaliyyət ===== */
 function renderFeed(){
-  if(!db.feed.length){$('#feedList').innerHTML='<li>Hələ fəaliyyət yoxdur.</li>';return;}
+  if(!feed.length){$('#feedList').innerHTML='<li>Hələ fəaliyyət yoxdur.</li>';return;}
   const c={cyan:'var(--cyan)',pink:'var(--pink)',amber:'var(--amber)',ok:'var(--ok)'};
-  $('#feedList').innerHTML=db.feed.slice(0,8).map(f=>`<li><i style="background:${c[f.c]||c.cyan};box-shadow:0 0 10px ${c[f.c]||c.cyan}"></i><div><b>${esc(f.t)}</b><small>${ago(f.time||now())}</small></div></li>`).join('');
+  $('#feedList').innerHTML=feed.slice(0,8).map(f=>`<li><i style="background:${c[f.c]||c.cyan};box-shadow:0 0 10px ${c[f.c]||c.cyan}"></i><div><b>${esc(f.t)}</b><small>${ago(f.time||now())}</small></div></li>`).join('');
 }
-async function renderAll(){await renderGroups();await renderReq();await renderChat();renderFeed();renderStats();await renderAccounts();watchAccounts();}
+
+/* ===== hamısını serverdən yenilə ===== */
+let busy=false, again=false;
+async function refresh(){
+  if(busy){again=true;return;}
+  busy=true;
+  try{
+    await Promise.all([api.loadGroups(),api.loadRequests()]);
+    renderGroups();renderReq();renderFeed();
+    if(!$('#tab-messages').hidden)await renderChat();
+    await renderAccounts();
+  }finally{busy=false;if(again){again=false;refresh();}}
+}
+
+/* ===== realtime: yeni sorğu/mesaj gələndə dərhal görünür ===== */
+let chan=null, rt=null;
+function watch(){
+  if(!sb||chan)return;
+  const kick=()=>{clearTimeout(rt);rt=setTimeout(refresh,300);};
+  chan=sb.channel('admin-live');
+  for(const table of ['account_approvals','join_requests','groups','group_members','messages'])
+    chan.on('postgres_changes',{event:'*',schema:'public',table},kick);
+  chan.subscribe();
+}
+function unwatch(){if(chan){sb.removeChannel(chan);chan=null;}}
 
 /* ===== arxa fon: hərəkətli şəbəkə ===== */
 (function(){
