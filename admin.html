@@ -281,9 +281,38 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){}};
 const findG=id=>db.groups.find(g=>g.id===id);
 function log(t,c='cyan'){db.feed.unshift({t,c,time:now()});db.feed=db.feed.slice(0,30);save();renderFeed();}
 
+/* ===== Supabase girişi (admin üçün AYRI saxlanır, F5-dən sonra qalır) ===== */
+let sb=null;
+async function getSb(){
+  if(sb)return sb;
+  const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');
+  const cfg=await import('/supabase-config.js');
+  sb=createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+    auth:{storageKey:'chatbot-admin-auth',persistSession:true,autoRefreshToken:true}
+  });
+  return sb;
+}
+async function checkAdmin(){
+  const {data,error}=await sb.rpc('is_admin');
+  if(error||!data){await sb.auth.signOut();const e=new Error('notadmin');e.code='notadmin';throw e;}
+}
+
 const api={
-  async login(email,pass){ if(!email||!pass)throw new Error('empty'); return {email}; },  // TODO: supabase.auth.signInWithPassword
-  async logout(){},                                                                        // TODO: supabase.auth.signOut
+  async login(email,pass){
+    await getSb();
+    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error)throw error;
+    await checkAdmin();
+    return data.user;
+  },
+  async restore(){                      // səhifə açılanda/F5-də girişi bərpa edir
+    await getSb();
+    const {data}=await sb.auth.getSession();
+    if(!data.session)return null;
+    await checkAdmin();
+    return data.session.user;
+  },
+  async logout(){ if(sb)await sb.auth.signOut(); },
   async listGroups(){ return db.groups; },
   async createGroup(name){
     const g={id:uid(),name,code:rand(),members:[],threat:false,created:now()};
@@ -342,15 +371,23 @@ function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clea
 let query='', reqFilter='all', curGroup=null;
 
 /* ===== giriş ===== */
+function enter(u){$('#who').textContent=u.email||'';$('#login').hidden=true;$('#app').classList.add('on');renderAll();}
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();$('#err').textContent='';
-  let u;
-  try{u=await api.login($('#em').value.trim(),$('#pw').value);}
-  catch(x){$('#err').textContent='E-poçt və ya şifrə yanlışdır. Yenidən yoxlayın.';return;}
-  $('#who').textContent=u.email;$('#login').hidden=true;$('#app').classList.add('on');
-  renderAll();
+  const btn=e.submitter||$('#loginForm button');btn.disabled=true;btn.textContent='Yoxlanılır...';
+  try{enter(await api.login($('#em').value.trim(),$('#pw').value));}
+  catch(x){
+    console.error(x);
+    $('#err').textContent=x.code==='notadmin'?'Bu hesabın admin icazəsi yoxdur.'
+      :/fetch|import|module/i.test(x.message||'')?'Serverə qoşulmaq alınmadı. İnterneti yoxlayın.'
+      :'E-poçt və ya şifrə yanlışdır. Yenidən yoxlayın.';
+  }finally{btn.disabled=false;btn.textContent='Daxil ol';}
 });
 $('#logout').onclick=async()=>{await api.logout();$('#app').classList.remove('on');$('#login').hidden=false;$('#pw').value='';};
+/* səhifə açılanda: əvvəl daxil olmusunuzsa, birbaşa panelə keçir */
+api.restore().then(u=>{if(u)enter(u);}).catch(x=>{
+  if(x.code==='notadmin')$('#err').textContent='Bu hesabın admin icazəsi yoxdur.';
+});
 
 /* ===== bölmələr ===== */
 function showTab(name){
