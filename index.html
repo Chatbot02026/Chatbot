@@ -265,7 +265,7 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
         <button class="btn primary" type="submit" aria-label="Mesaj göndər">Göndər</button>
       </form>
 
-      <div class="note">🔒 Qrup mesajları yalnız qrup üzvlərinə açıqdır.</div>
+      <div class="note">🔒 Mesajlar cihazınızda şifrələnir. Server yalnız şifrəli mətni saxlayır — oxuya bilənlər qrup üzvləri və admindir.</div>
     </section>
 
     <section class="panel glass" id="tab-join" hidden>
@@ -286,6 +286,7 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/supabase-config.js';
+import * as E2E from '/e2e.js';
 
 const configured =
   !SUPABASE_URL.includes('YOUR_PROJECT') &&
@@ -304,6 +305,7 @@ let selectToken = 0;
 let pendingSuccess = false;
 let tab = 'chat';
 let unread = 0;
+let ring = null;   // şifrələmə açar dəsti
 
 /* ===== ARXA FON: canlı şəbəkə ===== */
 (function(){
@@ -686,6 +688,14 @@ async function gate(u, manual = false){
 async function openApp(u, justApproved){
   stopApproval();
   $('#pending-view').classList.add('hidden');
+  // Uçdan-uca şifrələmə açarı: yoxdursa PIN yaradılır, başqa cihazdırsa PIN soruşulur
+  if(!ring){
+    try{
+      const id = await E2E.ensureIdentity(supabase, u);
+      if(currentUid !== u.id) return;
+      ring = E2E.keyring(supabase, u.id, id.priv);
+    }catch(err){ console.error(err); toast('Şifrələmə açarı hazırlanmadı: ' + (err.message || err)); return showPending('error', u); }
+  }
   const { data, error } = await supabase.from('groups').select('id').limit(1);
   if(currentUid !== u.id) return;
   watchMembership(u.id);
@@ -732,6 +742,7 @@ async function joinWithCode(code){
     case 'pending':       return 'pending';
     case 'not_approved':  toast('Hesabınız hələ admin tərəfindən təsdiqlənməyib.'); return 'error';
     case 'not_logged_in': toast('Əvvəlcə daxil olun.'); return 'error';
+    case 'no_key':        toast('Şifrələmə açarı yaradılmayıb. Çıxıb yenidən daxil olun.'); return 'error';
     default:              toast('Qrup kodu tapılmadı. Kodu yoxlayın.'); return 'invalid';
   }
 }
@@ -757,6 +768,7 @@ function showAuth(session){
   $('#app').classList.add('hidden');
 
   if(!newUser){
+    ring = null;
     stopApproval();
     $('#pending-view').classList.add('hidden');
     $('#code-view').classList.add('hidden');
@@ -775,7 +787,7 @@ function showAuth(session){
 async function loadGroups(){
   const { data, error } = await supabase
     .from('groups')
-    .select('id,name,created_at')
+    .select('id,name,created_at,key_version')
     .order('created_at', { ascending:false });
 
   if(error) return toast(error.message);
@@ -817,7 +829,7 @@ async function chooseGroup(id){
 
   const { data:g, error } = await supabase
     .from('groups')
-    .select('id,name')
+    .select('id,name,key_version')
     .eq('id', id)
     .single();
 
@@ -826,7 +838,7 @@ async function chooseGroup(id){
 
   activeGroup = g;
   $('#room-name').textContent = g.name;
-  $('#room-info').textContent = 'Qrup üzvləri ilə təhlükəsiz söhbət';
+  $('#room-info').textContent = '🔒 Uçdan-uca şifrəli söhbət';
 
   // Realtime əvvəl qoşulur, sonra tarixçə yüklənir
   realtime = supabase
@@ -889,7 +901,11 @@ function appendMessage(m){
   who.textContent = own ? 'Siz' : 'Qrup üzvü';
 
   const text = document.createElement('span');
-  text.textContent = m.body;
+  text.textContent = '…';
+  (ring ? ring.decrypt(m.group_id, m.body) : Promise.resolve({ text:'🔒', state:'locked' })).then(d => {
+    text.textContent = d.text;
+    if(d.state === 'locked'){ row.style.opacity = '.6'; row.style.fontStyle = 'italic'; }
+  });
 
   const time = document.createElement('small');
   time.className = 't';
@@ -1031,7 +1047,13 @@ if(!configured){
 
   /* --- Təsdiq gözləmə ekranı --- */
   $('#pending-check').onclick = () => { if(user) gate(user, true); };
-  $('#pending-out').onclick = async () => { await supabase.auth.signOut(); toast('Hesabdan çıxış edildi.'); };
+  async function signOutAll(){
+    if(user) await E2E.forget(user.id);
+    ring = null;
+    await supabase.auth.signOut();
+    toast('Hesabdan çıxış edildi.');
+  }
+  $('#pending-out').onclick = signOutAll;
 
   /* --- Qrup kodu pəncərəsi --- */
   $('#code-form').onsubmit = async e => {
@@ -1057,13 +1079,10 @@ if(!configured){
     }finally{ btn.disabled = false; btn.textContent = 'Qoşul'; }
   };
   $('#code-again').onclick = () => showCode(user, false, 'enter');
-  $('#code-out').onclick = async () => { await supabase.auth.signOut(); toast('Hesabdan çıxış edildi.'); };
+  $('#code-out').onclick = signOutAll;
 
   /* --- Çıxış --- */
-  $('#signout').onclick = async () => {
-    await supabase.auth.signOut();
-    toast('Hesabdan çıxış edildi.');
-  };
+  $('#signout').onclick = signOutAll;
 
   /* --- Qrup seçimi --- */
   $('#groups').onchange = e => chooseGroup(e.target.value);
@@ -1111,10 +1130,21 @@ if(!configured){
     if(!activeGroup) return toast('Əvvəlcə qrupa qoşulun.');
 
     const field = $('#message');
-    const body = field.value.trim();
-    if(!body) return;
-
+    const plain = field.value.trim();
+    if(!plain) return;
     field.value = '';
+
+    // Cari açar versiyası (admin «Təhlükə» basıbsa dəyişmiş ola bilər)
+    const { data:gv } = await supabase.from('groups').select('key_version').eq('id', activeGroup.id).maybeSingle();
+    let body;
+    try{
+      body = await ring.encrypt(activeGroup.id, gv?.key_version ?? activeGroup.key_version, plain);
+    }catch(err){
+      field.value = plain;
+      return toast(err.code === 'no_group_key'
+        ? 'Qrupun şifrələmə açarı hələ gəlməyib. Bir az sonra yenidən yoxlayın.'
+        : 'Şifrələmə xətası: ' + err.message);
+    }
 
     const { data, error } = await supabase
       .from('messages')
@@ -1123,7 +1153,7 @@ if(!configured){
       .single();
 
     if(error){
-      field.value = body;
+      field.value = plain;
       return toast(error.message);
     }
 
