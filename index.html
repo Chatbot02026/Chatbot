@@ -167,7 +167,10 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
 
         <div id="confirm-field" class="hidden">
           <label for="password2">Şifrəni təsdiqlə</label>
-          <input class="field" id="password2" type="password" autocomplete="new-password">
+          <div class="pwwrap">
+            <input class="field" id="password2" type="password" autocomplete="new-password">
+            <button id="password2-toggle" type="button" class="pwtoggle" aria-label="Təkrar şifrəni göstər/gizlət">Göstər</button>
+          </div>
         </div>
 
         <ul id="pw-rules" class="pw-rules hidden">
@@ -179,6 +182,7 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-conte
         </ul>
 
         <button id="auth-submit" class="btn primary block" type="submit">Daxil ol</button>
+        <div id="auth-err" role="alert" style="color:var(--pink);font-size:13px;margin-top:12px;min-height:18px;text-align:center"></div>
       </form>
 
       <div class="reg"><span id="register-text">Hesabınız yoxdur?</span><button id="auth-toggle" type="button">Hesab yarat</button></div>
@@ -476,7 +480,7 @@ const PW_RULES = {
   upper:  p => /\p{Lu}/u.test(p),
   lower:  p => /\p{Ll}/u.test(p),
   digit:  p => /\d/.test(p),
-  symbol: p => /[!@#$%^&*()_+\-=\[\]{};':"\\|<>?,.\/`~]/.test(p)
+  symbol: p => /[^\p{L}\p{N}\s]/u.test(p)   // istənilən simvol: ! @ # € № _ və s.
 };
 
 const passwordIsStrong = p => Object.values(PW_RULES).every(check => check(p));
@@ -913,6 +917,7 @@ if(!configured){
     $('#pw-rules').classList.toggle('hidden', !on);
     $('#confirm-field').classList.toggle('hidden', !on);
     renderPwRules();
+    $('#auth-err').textContent = '';
   }
   $('#tab-login').onclick = () => setMode(false);
   $('#tab-signup').onclick = () => setMode(true);
@@ -934,12 +939,36 @@ if(!configured){
   };
 
   /* --- Şifrəni göstər/gizlət --- */
-  $('#password-toggle').onclick = () => {
-    const password = $('#password');
-    const show = password.type === 'password';
-    password.type = show ? 'text' : 'password';
-    $('#password-toggle').textContent = show ? 'Gizlət' : 'Göstər';
-  };
+  function pwToggle(inputSel, btnSel){
+    $(btnSel).onclick = () => {
+      const f = $(inputSel), show = f.type === 'password';
+      f.type = show ? 'text' : 'password';
+      $(btnSel).textContent = show ? 'Gizlət' : 'Göstər';
+    };
+  }
+  pwToggle('#password', '#password-toggle');
+  pwToggle('#password2', '#password2-toggle');
+
+  /* Supabase xətalarını başa düşülən dilə çevir və ekranda saxla */
+  function authError(err){
+    const m = String(err?.message || err || '');
+    const map = [
+      [/already registered|already exists/i, 'Bu e-poçt artıq qeydiyyatdan keçib. «Daxil ol» bölməsindən girin.'],
+      [/rate limit|too many|security purposes/i, 'Çox tez-tez cəhd edildi. Bir neçə dəqiqə gözləyib yenidən yoxlayın.'],
+      [/signups? not allowed|signup.*disabled/i, 'Qeydiyyat Supabase-də bağlıdır (Authentication → Sign In / Providers → Allow new users).'],
+      [/database error/i, 'Bazada xəta baş verdi (SQL trigger). Adminə bildirin.'],
+      [/invalid.*email|email.*invalid/i, 'E-poçt ünvanı düzgün deyil.'],
+      [/invalid login|invalid credentials/i, 'E-poçt və ya şifrə yanlışdır.'],
+      [/email not confirmed/i, 'E-poçtunuz təsdiqlənməyib. Poçtunuzdakı linkə basın.'],
+      [/password.*(short|weak|least)/i, 'Şifrə çox zəifdir.'],
+      [/fetch|network/i, 'İnternet bağlantısı yoxdur və ya server cavab vermir.']
+    ];
+    const hit = map.find(([re]) => re.test(m));
+    const text = hit ? hit[1] : m;
+    $('#auth-err').textContent = text + (hit ? '' : '');
+    console.error('Auth xətası:', m);
+    toast(text);
+  }
 
   /* --- Giriş / qeydiyyat --- */
   $('#auth-form').onsubmit = async e => {
@@ -949,14 +978,16 @@ if(!configured){
     const email = $('#email').value.trim();
     const password = $('#password').value;
 
-    if(!email || !password) return toast('E-poçt və şifrəni daxil edin.');
+    $('#auth-err').textContent = '';
+    if(!email || !password) return authError('E-poçt və şifrəni daxil edin.');
 
     if(signup && !passwordIsStrong(password)){
       renderPwRules();
-      return toast('Şifrə tələbləri ödəmir: 8+ simvol, böyük və kiçik hərf, rəqəm və simvol.');
+      const miss = [...document.querySelectorAll('#pw-rules li:not(.ok)')].map(li => li.textContent.toLowerCase());
+      return authError('Şifrədə çatışmır: ' + miss.join(', ') + '.');
     }
 
-    if(signup && $('#password2').value !== password) return toast('Şifrələr eyni deyil.');
+    if(signup && $('#password2').value !== password) return authError('Şifrələr eyni deyil. Təkrar şifrəni yoxlayın.');
 
     button.disabled = true;
     button.textContent = signup ? 'Hesab yaradılır...' : 'Daxil olunur...';
@@ -967,7 +998,13 @@ if(!configured){
         ? await supabase.auth.signUp({ email, password })
         : await supabase.auth.signInWithPassword({ email, password });
 
-      if(error){ pendingSuccess = false; return toast(error.message); }
+      if(error){ pendingSuccess = false; return authError(error); }
+
+      // E-poçt təsdiqi açıq olanda təkrar qeydiyyat xəta vermir, boş identities qaytarır
+      if(signup && data.user && Array.isArray(data.user.identities) && !data.user.identities.length){
+        pendingSuccess = false;
+        return authError('already registered');
+      }
 
       if(signup){ showSuccess(!data.session); return; }
       // Uğurlu girişdə onAuthStateChange ekranı avtomatik dəyişir.
